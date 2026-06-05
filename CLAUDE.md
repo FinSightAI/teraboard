@@ -97,7 +97,27 @@ For the next iteration the user should likely migrate from static HTML to a fram
 
 When migrating, preserve the visual design — the user already approved it.
 
-## Design System (already in the HTML)
+## Design System — "Warm Botanical" (current)
+
+The UI was redesigned into a holistic terracotta · olive · sand aesthetic. The
+single source of truth is **`css/botanical.css`** (CSS variables + fonts that
+auto-switch by `<html lang>`). All 4 pages link it — no per-page `<style>` blocks.
+
+```
+Terracotta (CTA):  #c2734a  (hover #a85d38)
+Olive:             #6f7e52
+Olive deep (btns): #4f5d3a
+Sand bg:           #f6efe3 → #ece0cd (warm-mesh gradient + radial accents)
+Cream card:        #fffdf8
+Ink (text):        #33291d   Ink soft: #8a7c68
+Line/border:       #e7dcc9   Gold (stars): #d99b4e
+Fonts — display:   Fraunces (EN/PT), Frank Ruhl Libre (HE);  body: Mulish (EN/PT), Heebo (HE)
+Motifs:            botanical leaf SVG (hero flanks + card watermark), radius 26px cards / 100px pills
+```
+
+To restyle, edit `css/botanical.css` only. The previous green/sage palette below is kept for reference.
+
+## Design System (original prototype — superseded by Warm Botanical)
 
 ```
 Primary green:    #3a5a4a
