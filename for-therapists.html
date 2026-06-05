@@ -4,81 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeraBoard — למטפלים</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Heebo', sans-serif;
-    background: linear-gradient(180deg, #f7f5f1 0%, #ebe7e0 100%);
-    color: #2c2a26; min-height: 100vh;
-  }
-  header {
-    background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    position: sticky; top: 0; z-index: 100; padding: 18px 40px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; color: #3a5a4a; text-decoration: none; }
-  .logo-mark { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #7ba990, #3a5a4a); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
-  nav { display: flex; gap: 20px; align-items: center; }
-  nav a { color: #555; text-decoration: none; font-weight: 500; font-size: 15px; }
-  nav a:hover { color: #3a5a4a; }
-  .btn-primary { background: #3a5a4a; color: white; padding: 10px 22px; border-radius: 100px; border: none; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
-  .btn-primary:hover { background: #2c4538; }
-  .btn-ghost { background: transparent; color: #3a5a4a; border: 1px solid #d6d2cb; padding: 9px 18px; border-radius: 100px; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; }
-
-  .wrap { max-width: 720px; margin: 0 auto; padding: 50px 24px 90px; }
-  .hero-h { text-align: center; margin-bottom: 36px; }
-  .hero-h h1 { font-size: 38px; font-weight: 800; color: #1f2e26; line-height: 1.2; margin-bottom: 14px; }
-  .hero-h h1 span { color: #7ba990; }
-  .hero-h p { font-size: 17px; color: #6b6862; max-width: 520px; margin: 0 auto; line-height: 1.6; }
-
-  .card-box { background: white; border-radius: 22px; padding: 32px; box-shadow: 0 10px 40px rgba(58,90,74,0.08); border: 1px solid rgba(0,0,0,0.04); margin-bottom: 24px; }
-  .card-box h2 { font-size: 20px; color: #1f2e26; margin-bottom: 4px; }
-  .card-box .sub { color: #6b6862; font-size: 14px; margin-bottom: 22px; }
-
-  .form-row { margin-bottom: 16px; }
-  .form-row label { display: block; font-size: 13px; color: #4a4844; margin-bottom: 6px; font-weight: 600; }
-  .form-row input, .form-row select, .form-row textarea {
-    width: 100%; padding: 12px 14px; border: 1px solid #e6e2db; border-radius: 10px;
-    font-family: inherit; font-size: 14px; outline: none; background: white; color: #2c2a26;
-  }
-  .form-row textarea { min-height: 90px; resize: vertical; }
-  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: #7ba990; }
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .check { display: flex; align-items: center; gap: 8px; }
-  .check input { width: auto; }
-  .btn-full { width: 100%; background: #3a5a4a; color: white; border: none; padding: 14px; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; }
-  .btn-full:hover { background: #2c4538; }
-  .btn-full:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .tabs { display: flex; gap: 8px; margin-bottom: 22px; background: #f0ede7; padding: 5px; border-radius: 100px; }
-  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 100px; font-weight: 600; font-size: 14px; cursor: pointer; color: #6b6862; }
-  .tab.active { background: white; color: #3a5a4a; }
-
-  .note { font-size: 13px; padding: 12px 14px; border-radius: 10px; margin-bottom: 18px; line-height: 1.5; }
-  .note.warn { background: #fff7e6; color: #8a6d1f; border: 1px solid #f0e0b0; }
-  .note.ok   { background: #eaf3ee; color: #2c5a42; border: 1px solid #c9d8cd; }
-  .note.err  { background: #fbeaea; color: #8a2f2f; border: 1px solid #f0c0c0; }
-
-  .hidden { display: none; }
-  .muted { color: #9b9892; font-size: 13px; }
-
-  .booking-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0ede7; }
-  .booking-item:last-child { border-bottom: none; }
-  .booking-item .who { font-weight: 600; color: #1f2e26; }
-  .status { font-size: 12px; padding: 4px 10px; border-radius: 100px; font-weight: 600; }
-  .status.pending { background: #fff7e6; color: #8a6d1f; }
-  .status.confirmed { background: #eaf3ee; color: #2c5a42; }
-  .status.cancelled { background: #f0ede7; color: #9b9892; }
-
-  @media (max-width: 720px) {
-    header { padding: 14px 20px; }
-    nav a { display: none; }
-    .row-2 { grid-template-columns: 1fr; }
-    .hero-h h1 { font-size: 30px; }
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/botanical.css">
 </head>
 <body>
 
