@@ -1,10 +1,31 @@
-# CLAUDE.md — Merhav (מרחב) Project Context
+# CLAUDE.md — TeraBoard Project Context
 
 > This file is read automatically by Claude Code when it opens the project. It contains the full context of what was built and what's next.
 
-## Project: Merhav (מרחב) — Therapist Marketplace
+## Project: TeraBoard — Therapist Marketplace
 
-A multilingual web platform that connects users with licensed therapists. Currently a static HTML prototype built in three languages.
+A multilingual web platform that connects users with licensed therapists. Static HTML (no build step) with a Supabase data layer wired in.
+
+> **Brand:** TeraBoard (logo mark "T"). Renamed from the earlier working name "Merhav / מרחב".
+
+## Status (updated 2026-06-05) — Goals 1–3 done
+
+- **Goal 1 — Deployed.** Live in production at **https://teraboard.vercel.app**
+  (Vercel project `teraboard`, scope `finsightai-4755s-projects`). `/he` `/en` `/pt` clean routes work.
+- **Goal 2 — Backend scaffolded.** `supabase/schema.sql` (therapists/reviews/bookings + RLS +
+  `licenses` storage bucket + seed of the 12 sample therapists). `js/data.js` is a data layer that
+  fetches from Supabase when configured and **falls back to each page's sample array** otherwise, so
+  the site works before and after the DB is connected. Boards persist bookings via `TeraData.createBooking`.
+- **Goal 3 — Therapist signup.** `for-therapists.html`: Supabase Auth (email/password), license upload to
+  the `licenses` bucket, profile builder (upsert into `therapists`), and a bookings dashboard.
+
+### ⚠️ Remaining manual step to go fully live
+The backend is **not connected yet** — it runs on sample data until credentials are added:
+1. Create a Supabase project (region EU/Frankfurt).
+2. Run `supabase/schema.sql` in the SQL Editor.
+3. Put the Project URL + anon key into `js/config.js` (and as Vercel env if desired), then redeploy.
+
+Deploy command used: `vercel deploy --prod --yes --scope finsightai-4755s-projects`
 
 ## Current State
 
