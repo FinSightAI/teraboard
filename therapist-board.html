@@ -320,7 +320,7 @@ const categories = [
 ];
 
 let therapists = [
-  { name: 'ד״ר נועה לוי', speciality: 'פסיכולוגית קלינית', cat: 'psy', area: 'תל אביב', online: true, rating: 4.9, reviews: 142, price: 450, exp: 12, initial: 'נ', badge: 'מומלץ' },
+  { name: 'ד״ר נועה לוי', speciality: 'פסיכולוגית קלינית', cat: 'psy', area: 'תל אביב', online: true, rating: 4.9, reviews: 142, price: 450, exp: 12, initial: 'נ', badge: 'מומלץ', website: 'https://noa-levi.co.il', instagram: 'noa.levi.psy' },
   { name: 'יואב כהן', speciality: 'מטפל זוגי וקבוצתי', cat: 'couple', area: 'ירושלים', online: true, rating: 4.8, reviews: 89, price: 380, exp: 8, initial: 'י' },
   { name: 'ד״ר שירה אברהם', speciality: 'CBT והפרעות חרדה', cat: 'cbt', area: 'תל אביב', online: false, rating: 5.0, reviews: 56, price: 500, exp: 15, initial: 'ש', badge: 'חדש' },
   { name: 'מיכל ברק', speciality: 'מטפלת באמנות', cat: 'art', area: 'חיפה', online: true, rating: 4.7, reviews: 78, price: 320, exp: 6, initial: 'מ' },
@@ -381,6 +381,7 @@ function renderCards() {
       <div class="card-body">
         <h3>${t.name}</h3>
         <div class="speciality">${t.speciality}</div>
+        ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${t.area}</div>
           <div>⏱ ${t.exp} שנות ניסיון</div>

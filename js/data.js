@@ -26,13 +26,43 @@
       reviews: r.reviews_count,
       initial: r.initial,
       badge: r.badge || undefined,
+      website: r.website_url || undefined,
+      instagram: r.instagram || undefined,
     };
+  }
+
+  function normWebsite(v) {
+    if (!v) return null;
+    return /^https?:\/\//i.test(v) ? v : "https://" + v;
+  }
+  function normInstagram(v) {
+    if (!v) return null;
+    if (/^https?:\/\//i.test(v)) return v;
+    return "https://instagram.com/" + v.replace(/^@/, "");
   }
 
   const TeraData = {
     configured,
     client,
     isLive: () => Boolean(client),
+
+    // Language-neutral contact links (website + Instagram) for a therapist
+    // card. Returns '' when the therapist has neither. Clients can click through.
+    contactLinksHTML(t) {
+      const w = normWebsite(t.website);
+      const ig = normInstagram(t.instagram);
+      if (!w && !ig) return "";
+      const base =
+        "display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#f0ede7;text-decoration:none;font-size:16px;transition:background .2s;";
+      const a = (href, label, icon) =>
+        `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}" onclick="event.stopPropagation()" style="${base}" onmouseover="this.style.background='#c9d8cd'" onmouseout="this.style.background='#f0ede7'">${icon}</a>`;
+      return (
+        '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
+        (w ? a(w, "Website", "🌐") : "") +
+        (ig ? a(ig, "Instagram", "📸") : "") +
+        "</div>"
+      );
+    },
 
     // Returns therapists from Supabase, or the provided fallback array on
     // missing config / network error. Always resolves (never rejects).

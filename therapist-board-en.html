@@ -310,7 +310,7 @@ const categories = [
 ];
 
 let therapists = [
-  { name: 'Dr. Naomi Levi', speciality: 'Clinical Psychologist', cat: 'psy', area: 'New York', online: true, rating: 4.9, reviews: 142, price: 180, exp: 12, initial: 'N', badge: 'Recommended' },
+  { name: 'Dr. Naomi Levi', speciality: 'Clinical Psychologist', cat: 'psy', area: 'New York', online: true, rating: 4.9, reviews: 142, price: 180, exp: 12, initial: 'N', badge: 'Recommended', website: 'https://noa-levi.com', instagram: 'noa.levi.psy' },
   { name: 'Yoav Cohen', speciality: 'Couples & Group Therapist', cat: 'couple', area: 'London', online: true, rating: 4.8, reviews: 89, price: 150, exp: 8, initial: 'Y' },
   { name: 'Dr. Shira Abraham', speciality: 'CBT & Anxiety Disorders', cat: 'cbt', area: 'New York', online: false, rating: 5.0, reviews: 56, price: 200, exp: 15, initial: 'S', badge: 'New' },
   { name: 'Michal Barak', speciality: 'Art Therapist', cat: 'art', area: 'Berlin', online: true, rating: 4.7, reviews: 78, price: 130, exp: 6, initial: 'M' },
@@ -371,6 +371,7 @@ function renderCards() {
       <div class="card-body">
         <h3>${t.name}</h3>
         <div class="speciality">${t.speciality}</div>
+        ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${t.area}</div>
           <div>⏱ ${t.exp} yrs exp.</div>

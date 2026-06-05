@@ -27,6 +27,8 @@ create table if not exists public.therapists (
   initial       text,                     -- single-letter avatar fallback
   badge         text,                     -- e.g. 'מומלץ' / 'Recommended' / null
   license_number text,
+  website_url   text,                     -- therapist's own website (shown to clients)
+  instagram     text,                     -- Instagram handle or URL (shown to clients)
   verified      boolean not null default false,
   rating        numeric(2,1) not null default 0,   -- denormalized average (0.0–5.0)
   reviews_count integer not null default 0,         -- denormalized count
@@ -181,3 +183,7 @@ select * from (values
   ('ד״ר עומר נחום',    'פסיכואנליזה יונגיאנית',     'psy',       'ירושלים', false, 520, 20, 'ע', 'מומלץ', true, 4.9, 108)
 ) as seed(name, speciality, category, area, online, price, exp, initial, badge, verified, rating, reviews_count)
 where not exists (select 1 from public.therapists);
+
+-- Demo links on a couple of seed profiles (so clients can see the feature).
+update public.therapists set website_url = 'https://noa-levi.co.il',  instagram = 'noa.levi.psy'    where name = 'ד״ר נועה לוי';
+update public.therapists set website_url = 'https://yael-yoga.co.il',  instagram = 'yael.bodymind'   where name = 'יעל גולדמן';

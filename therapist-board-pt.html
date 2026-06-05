@@ -137,7 +137,7 @@
 </header>
 
 <section class="hero">
-  <h1>Encontre o <span>terapeuta certo</span> para você</h1>
+  <h1>Encontre o <span>terapeuta ideal</span> para você</h1>
   <p>Uma plataforma que conecta você a milhares de profissionais licenciados em saúde mental, bem-estar emocional e cuidado corpo-mente — com avaliações reais e disponibilidade em tempo real.</p>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nome, área ou especialidade...">
@@ -162,9 +162,9 @@
       <span id="resultCount">12 resultados</span>
     </div>
     <select class="sort-select" id="sortBy" onchange="renderCards()">
-      <option value="rating">Melhor avaliados</option>
-      <option value="price-low">Preço: menor ao maior</option>
-      <option value="price-high">Preço: maior ao menor</option>
+      <option value="rating">Mais bem avaliados</option>
+      <option value="price-low">Preço: do menor ao maior</option>
+      <option value="price-high">Preço: do maior ao menor</option>
       <option value="reviews">Mais avaliações</option>
     </select>
   </div>
@@ -218,7 +218,7 @@ const categories = [
   { icon: '🧠', name: 'Todos', value: 'all' },
   { icon: '💭', name: 'Psicoterapia', value: 'psy' },
   { icon: '👥', name: 'Casais', value: 'couple' },
-  { icon: '👶', name: 'Crianças', value: 'kids' },
+  { icon: '👶', name: 'Crianças e Jovens', value: 'kids' },
   { icon: '🌿', name: 'TCC', value: 'cbt' },
   { icon: '🎭', name: 'Arteterapia', value: 'art' },
   { icon: '🧘', name: 'Corpo-Mente', value: 'body' },
@@ -226,7 +226,7 @@ const categories = [
 ];
 
 let therapists = [
-  { name: 'Dra. Naomi Levi', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 142, price: 280, exp: 12, initial: 'N', badge: 'Recomendado' },
+  { name: 'Dra. Naomi Levi', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 142, price: 280, exp: 12, initial: 'N', badge: 'Recomendado', website: 'https://noa-levi.com', instagram: 'noa.levi.psy' },
   { name: 'Yoav Cohen', speciality: 'Terapeuta de Casais', cat: 'couple', area: 'Lisboa', online: true, rating: 4.8, reviews: 89, price: 240, exp: 8, initial: 'Y' },
   { name: 'Dra. Shira Abraham', speciality: 'TCC e Transtornos de Ansiedade', cat: 'cbt', area: 'São Paulo', online: false, rating: 5.0, reviews: 56, price: 320, exp: 15, initial: 'S', badge: 'Novo' },
   { name: 'Michal Barak', speciality: 'Arteterapeuta', cat: 'art', area: 'Porto', online: true, rating: 4.7, reviews: 78, price: 200, exp: 6, initial: 'M' },
@@ -287,9 +287,10 @@ function renderCards() {
       <div class="card-body">
         <h3>${t.name}</h3>
         <div class="speciality">${t.speciality}</div>
+        ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${t.area}</div>
-          <div>⏱ ${t.exp} anos exp.</div>
+          <div>⏱ ${t.exp} anos de exp.</div>
           ${t.online ? '<div>💻 Online</div>' : ''}
         </div>
         <div class="rating">

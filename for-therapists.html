@@ -171,6 +171,16 @@
         <label>מספר רישיון</label>
         <input type="text" id="pLicense" placeholder="מספר רישיון משרד הבריאות">
       </div>
+      <div class="row-2">
+        <div class="form-row">
+          <label>אתר אישי <span class="muted">(יוצג למטופלים)</span></label>
+          <input type="url" id="pWebsite" placeholder="https://your-site.co.il">
+        </div>
+        <div class="form-row">
+          <label>אינסטגרם <span class="muted">(יוצג למטופלים)</span></label>
+          <input type="text" id="pInstagram" placeholder="@username">
+        </div>
+      </div>
       <div class="form-row check">
         <input type="checkbox" id="pOnline">
         <label for="pOnline" style="margin:0;">זמין/ה גם לטיפול אונליין</label>
@@ -275,6 +285,8 @@ function fillProfile() {
   pExp.value = t.exp || '';
   pBio.value = t.bio || '';
   pLicense.value = t.license_number || '';
+  pWebsite.value = t.website_url || '';
+  pInstagram.value = t.instagram || '';
   pOnline.checked = Boolean(t.online);
 }
 
@@ -304,6 +316,8 @@ async function saveProfile() {
       exp: parseInt(pExp.value || '0', 10),
       bio: pBio.value.trim(),
       license_number: pLicense.value.trim(),
+      website_url: pWebsite.value.trim() || null,
+      instagram: pInstagram.value.trim() || null,
       online: pOnline.checked,
       initial: (pName.value.trim()[0] || 'T'),
     };
