@@ -18,6 +18,18 @@ A multilingual web platform that connects users with licensed therapists. Static
   the site works before and after the DB is connected. Boards persist bookings via `TeraData.createBooking`.
 - **Goal 3 — Therapist signup.** `for-therapists.html`: Supabase Auth (email/password), license upload to
   the `licenses` bucket, profile builder (upsert into `therapists`), and a bookings dashboard.
+- **Profile pages.** `therapist.html` = tri-lingual full profile, shareable at **`/t/<id>`**
+  (rewrite → `therapist.html?id=`); Supabase-by-id with a `sessionStorage` fast-path from the boards.
+  Cards' "view profile" → `viewProfile()`. Therapists also have `website_url` + `instagram` (client-visible
+  icons on cards + profile). Why `/t/` not `/therapist/`: a rewrite to `/therapist.html` collides with cleanUrls
+  (404); destination must be the clean path `/therapist?id=:id`.
+- **Design = "Celestial"** spiritual theme (see Design System below). Single file `css/celestial.css`.
+
+### Open product decision (not yet built)
+**Monetization model** is undecided. Guidance given: therapy is a high-leakage category; at cold-start
+charge nothing — seed supply (free "founding therapists"), pick a narrow city+specialty wedge, give
+single-player value (shareable profile), manufacture demand, monetize only proven value later. You can
+only reliably bill on what flows through the platform (on-platform payments) or on delivered leads.
 
 ### ⚠️ Remaining manual step to go fully live
 The backend is **not connected yet** — it runs on sample data until credentials are added:
@@ -97,25 +109,27 @@ For the next iteration the user should likely migrate from static HTML to a fram
 
 When migrating, preserve the visual design — the user already approved it.
 
-## Design System — "Warm Botanical" (current)
+## Design System — "Celestial" (current)
 
-The UI was redesigned into a holistic terracotta · olive · sand aesthetic. The
-single source of truth is **`css/botanical.css`** (CSS variables + fonts that
-auto-switch by `<html lang>`). All 4 pages link it — no per-page `<style>` blocks.
+Spiritual / holistic theme: amethyst · indigo · gold on a lavender mist, with
+lotus motifs and soft auras. Single source of truth is **`css/celestial.css`**
+(CSS variables + fonts that auto-switch by `<html lang>`). All 5 pages link it —
+no per-page `<style>` blocks. (An earlier "Warm Botanical" terracotta/olive theme
+was rejected by the user in favour of this purple/spiritual direction.)
 
 ```
-Terracotta (CTA):  #c2734a  (hover #a85d38)
-Olive:             #6f7e52
-Olive deep (btns): #4f5d3a
-Sand bg:           #f6efe3 → #ece0cd (warm-mesh gradient + radial accents)
-Cream card:        #fffdf8
-Ink (text):        #33291d   Ink soft: #8a7c68
-Line/border:       #e7dcc9   Gold (stars): #d99b4e
-Fonts — display:   Fraunces (EN/PT), Frank Ruhl Libre (HE);  body: Mulish (EN/PT), Heebo (HE)
-Motifs:            botanical leaf SVG (hero flanks + card watermark), radius 26px cards / 100px pills
+Violet (CTA):      #6d4fb0  (hover #553c92)
+Amethyst:          #8a6fd1
+Indigo (2nd btns): #3a2b63
+Lavender mist bg:  #f4effb → #e7dcf5 (mist + violet/gold radial auras)
+Card:              #fdfbff
+Ink (text):        #2c2440   Ink soft: #74688f
+Line/border:       #e7def5   Gold (stars): #c2a14e
+Fonts — display:   Cormorant Garamond (EN/PT), Frank Ruhl Libre (HE);  body: Mulish (EN/PT), Heebo (HE)
+Motifs:            five-petal lotus SVG (hero crown + card watermark); staggered card entrance animation
 ```
 
-To restyle, edit `css/botanical.css` only. The previous green/sage palette below is kept for reference.
+To restyle, edit `css/celestial.css` only. The original green/sage prototype palette below is kept for reference.
 
 ## Design System (original prototype — superseded by Warm Botanical)
 
