@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merhav — Encontre seu terapeuta</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg, #f7f5f1 0%, #ebe7e0 100%);
+    color: #2c2a26;
+    min-height: 100vh;
+  }
+  header {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    position: sticky; top: 0; z-index: 100;
+    padding: 18px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; color: #3a5a4a; }
+  .logo-mark { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #7ba990, #3a5a4a); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+  nav { display: flex; gap: 28px; align-items: center; }
+  nav a { color: #555; text-decoration: none; font-weight: 500; font-size: 15px; transition: color 0.2s; }
+  nav a:hover { color: #3a5a4a; }
+  .btn-primary {
+    background: #3a5a4a; color: white; padding: 10px 22px; border-radius: 100px;
+    border: none; font-family: inherit; font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #2c4538; transform: translateY(-1px); }
+
+  .lang-switch { display: flex; gap: 6px; background: #f0ede7; padding: 4px; border-radius: 100px; }
+  .lang-switch a { padding: 6px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; text-decoration: none; color: #6b6862; }
+  .lang-switch a.active { background: white; color: #3a5a4a; }
+
+  .hero { padding: 70px 40px 50px; text-align: center; max-width: 900px; margin: 0 auto; }
+  .hero h1 { font-size: 48px; font-weight: 800; line-height: 1.15; color: #1f2e26; margin-bottom: 18px; }
+  .hero h1 span { color: #7ba990; }
+  .hero p { font-size: 18px; color: #6b6862; max-width: 600px; margin: 0 auto 35px; line-height: 1.6; }
+
+  .search-bar {
+    background: white; border-radius: 100px; padding: 8px;
+    display: flex; gap: 4px; align-items: center;
+    box-shadow: 0 10px 40px rgba(58,90,74,0.12);
+    max-width: 700px; margin: 0 auto;
+  }
+  .search-input { flex: 1; border: none; padding: 14px 22px; font-family: inherit; font-size: 15px; background: transparent; outline: none; color: #2c2a26; }
+  .search-bar select { border: none; padding: 14px 18px; font-family: inherit; font-size: 15px; background: transparent; outline: none; color: #555; cursor: pointer; border-left: 1px solid #eee; }
+  .search-btn { background: #3a5a4a; color: white; border: none; padding: 14px 28px; border-radius: 100px; font-family: inherit; font-weight: 600; cursor: pointer; font-size: 15px; }
+  .search-btn:hover { background: #2c4538; }
+
+  .categories { padding: 40px 40px 20px; max-width: 1280px; margin: 0 auto; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .chip { background: white; border: 1px solid #e6e2db; padding: 9px 18px; border-radius: 100px; font-size: 14px; cursor: pointer; transition: all 0.2s; color: #4a4844; display: flex; align-items: center; gap: 6px; }
+  .chip:hover, .chip.active { background: #3a5a4a; color: white; border-color: #3a5a4a; }
+
+  .listings { padding: 30px 40px 80px; max-width: 1280px; margin: 0 auto; }
+  .listings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .listings-header h2 { font-size: 22px; color: #1f2e26; }
+  .listings-header span { color: #6b6862; font-size: 14px; }
+  .sort-select { background: white; border: 1px solid #e6e2db; padding: 10px 16px; border-radius: 8px; font-family: inherit; font-size: 14px; cursor: pointer; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 22px; }
+  .card { background: white; border-radius: 22px; overflow: hidden; transition: all 0.3s; cursor: pointer; border: 1px solid rgba(0,0,0,0.04); }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(58,90,74,0.15); }
+  .card-img { height: 180px; background: linear-gradient(135deg, #c9d8cd, #7ba990); position: relative; display: flex; align-items: flex-end; padding: 18px; }
+  .badge { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.95); padding: 6px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; color: #3a5a4a; }
+  .avatar { width: 64px; height: 64px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: #3a5a4a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .card-body { padding: 20px; }
+  .card-body h3 { font-size: 18px; color: #1f2e26; margin-bottom: 4px; }
+  .speciality { color: #7ba990; font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+  .info-row { display: flex; gap: 16px; color: #6b6862; font-size: 13px; margin-bottom: 14px; }
+  .info-row > div { display: flex; align-items: center; gap: 5px; }
+  .rating { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .stars { color: #f5b342; font-size: 14px; }
+  .rating-num { font-weight: 600; color: #2c2a26; font-size: 14px; }
+  .reviews-count { color: #9b9892; font-size: 13px; }
+  .price { font-size: 16px; color: #1f2e26; font-weight: 700; }
+  .price small { color: #9b9892; font-weight: 400; font-size: 12px; }
+  .card-footer { border-top: 1px solid #f0ede7; padding: 14px 20px; display: flex; gap: 8px; }
+  .btn-outline { flex: 1; background: white; border: 1px solid #d6d2cb; padding: 10px; border-radius: 10px; font-family: inherit; font-weight: 500; cursor: pointer; font-size: 13px; color: #4a4844; }
+  .btn-outline:hover { background: #f7f5f1; }
+  .btn-book { flex: 1; background: #3a5a4a; color: white; border: none; padding: 10px; border-radius: 10px; font-family: inherit; font-weight: 600; cursor: pointer; font-size: 13px; }
+  .btn-book:hover { background: #2c4538; }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(31,46,38,0.5); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+  .modal-bg.active { display: flex; }
+  .modal { background: white; border-radius: 24px; max-width: 480px; width: 100%; padding: 32px; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 22px; color: #1f2e26; margin-bottom: 6px; }
+  .modal-sub { color: #6b6862; margin-bottom: 24px; font-size: 14px; }
+  .form-row { margin-bottom: 16px; }
+  .form-row label { display: block; font-size: 13px; color: #4a4844; margin-bottom: 6px; font-weight: 500; }
+  .form-row input, .form-row select { width: 100%; padding: 12px 14px; border: 1px solid #e6e2db; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; }
+  .form-row input:focus, .form-row select:focus { border-color: #7ba990; }
+  .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .slot { padding: 10px; border: 1px solid #e6e2db; border-radius: 8px; text-align: center; font-size: 13px; cursor: pointer; background: white; }
+  .slot:hover { border-color: #7ba990; }
+  .slot.selected { background: #3a5a4a; color: white; border-color: #3a5a4a; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .close-btn { flex: 1; background: white; border: 1px solid #d6d2cb; padding: 12px; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 500; }
+  .confirm-btn { flex: 1; background: #3a5a4a; color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 600; }
+
+  @media (max-width: 720px) {
+    header { padding: 14px 20px; }
+    nav a, nav .btn-primary { display: none; }
+    .hero { padding: 40px 20px 30px; }
+    .hero h1 { font-size: 32px; }
+    .search-bar { flex-direction: column; border-radius: 24px; padding: 12px; }
+    .search-bar select, .search-input { width: 100%; border-left: none; }
+    .search-btn { width: 100%; }
+    .listings { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">M</div>
+    Merhav
+  </div>
+  <nav>
+    <a href="#">Encontrar terapeuta</a>
+    <a href="#">Como funciona</a>
+    <a href="#">Para terapeutas</a>
+    <a href="#">Blog</a>
+    <div class="lang-switch">
+      <a href="therapist-board.html">HE</a>
+      <a href="therapist-board-en.html">EN</a>
+      <a href="#" class="active">PT</a>
+    </div>
+    <button class="btn-primary">Cadastrar</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Encontre o <span>terapeuta certo</span> para você</h1>
+  <p>Uma plataforma que conecta você a milhares de profissionais licenciados em saúde mental, bem-estar emocional e cuidado corpo-mente — com avaliações reais e disponibilidade em tempo real.</p>
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nome, área ou especialidade...">
+    <select id="areaFilter">
+      <option value="">Todas as cidades</option>
+      <option>São Paulo</option>
+      <option>Rio de Janeiro</option>
+      <option>Lisboa</option>
+      <option>Porto</option>
+      <option>Online</option>
+    </select>
+    <button class="search-btn" onclick="renderCards()">Buscar</button>
+  </div>
+</section>
+
+<div class="categories" id="categories"></div>
+
+<section class="listings">
+  <div class="listings-header">
+    <div>
+      <h2>Terapeutas recomendados</h2>
+      <span id="resultCount">12 resultados</span>
+    </div>
+    <select class="sort-select" id="sortBy" onchange="renderCards()">
+      <option value="rating">Melhor avaliados</option>
+      <option value="price-low">Preço: menor ao maior</option>
+      <option value="price-high">Preço: maior ao menor</option>
+      <option value="reviews">Mais avaliações</option>
+    </select>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle">Agendar sessão</h3>
+    <p class="modal-sub" id="modalSub"></p>
+    <div class="form-row">
+      <label>Nome completo</label>
+      <input type="text" placeholder="Seu nome">
+    </div>
+    <div class="form-row">
+      <label>Telefone</label>
+      <input type="tel" placeholder="(11) 90000-0000">
+    </div>
+    <div class="form-row">
+      <label>Tipo de sessão</label>
+      <select>
+        <option>Conversa inicial (grátis)</option>
+        <option>Sessão padrão</option>
+        <option>Remota (Zoom)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Escolha um horário — amanhã</label>
+      <div class="time-slots" id="slots">
+        <div class="slot">09:00</div>
+        <div class="slot">10:30</div>
+        <div class="slot">12:00</div>
+        <div class="slot">14:00</div>
+        <div class="slot">16:30</div>
+        <div class="slot">18:00</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="close-btn" onclick="closeModal()">Cancelar</button>
+      <button class="confirm-btn" onclick="confirmBooking()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const categories = [
+  { icon: '🧠', name: 'Todos', value: 'all' },
+  { icon: '💭', name: 'Psicoterapia', value: 'psy' },
+  { icon: '👥', name: 'Casais', value: 'couple' },
+  { icon: '👶', name: 'Crianças', value: 'kids' },
+  { icon: '🌿', name: 'TCC', value: 'cbt' },
+  { icon: '🎭', name: 'Arteterapia', value: 'art' },
+  { icon: '🧘', name: 'Corpo-Mente', value: 'body' },
+  { icon: '💊', name: 'Dependências', value: 'addiction' }
+];
+
+const therapists = [
+  { name: 'Dra. Naomi Levi', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 142, price: 280, exp: 12, initial: 'N', badge: 'Recomendado' },
+  { name: 'Yoav Cohen', speciality: 'Terapeuta de Casais', cat: 'couple', area: 'Lisboa', online: true, rating: 4.8, reviews: 89, price: 240, exp: 8, initial: 'Y' },
+  { name: 'Dra. Shira Abraham', speciality: 'TCC e Transtornos de Ansiedade', cat: 'cbt', area: 'São Paulo', online: false, rating: 5.0, reviews: 56, price: 320, exp: 15, initial: 'S', badge: 'Novo' },
+  { name: 'Michal Barak', speciality: 'Arteterapeuta', cat: 'art', area: 'Porto', online: true, rating: 4.7, reviews: 78, price: 200, exp: 6, initial: 'M' },
+  { name: 'Asaf Rosen', speciality: 'Psicoterapia Psicodinâmica', cat: 'psy', area: 'Rio de Janeiro', online: false, rating: 4.9, reviews: 203, price: 260, exp: 18, initial: 'A', badge: 'Recomendado' },
+  { name: 'Tamar Wiseman', speciality: 'Terapia Emocional Infantil', cat: 'kids', area: 'São Paulo', online: true, rating: 4.8, reviews: 95, price: 220, exp: 9, initial: 'T' },
+  { name: 'Dr. Ronen Stern', speciality: 'Recuperação de Dependências', cat: 'addiction', area: 'Lisboa', online: true, rating: 4.6, reviews: 67, price: 300, exp: 14, initial: 'R' },
+  { name: 'Yael Goldman', speciality: 'Yoga Terapêutica e Corpo-Mente', cat: 'body', area: 'Online', online: true, rating: 4.9, reviews: 124, price: 180, exp: 7, initial: 'Y' },
+  { name: 'Dana Alon', speciality: 'TCC para Adolescentes', cat: 'cbt', area: 'Porto', online: true, rating: 4.7, reviews: 41, price: 220, exp: 5, initial: 'D' },
+  { name: 'Uri Friedman', speciality: 'Terapia IMAGO para Casais', cat: 'couple', area: 'São Paulo', online: false, rating: 5.0, reviews: 38, price: 350, exp: 11, initial: 'U', badge: 'Novo' },
+  { name: 'Neta Berger', speciality: 'Arte e Trauma', cat: 'art', area: 'Rio de Janeiro', online: true, rating: 4.8, reviews: 72, price: 210, exp: 10, initial: 'N' },
+  { name: 'Dr. Omer Nachum', speciality: 'Psicanálise Junguiana', cat: 'psy', area: 'Lisboa', online: false, rating: 4.9, reviews: 108, price: 330, exp: 20, initial: 'O', badge: 'Recomendado' }
+];
+
+let activeCategory = 'all';
+let selectedTherapist = null;
+
+function renderCategories() {
+  document.getElementById('categories').innerHTML = categories.map(c =>
+    `<div class="chip ${c.value === activeCategory ? 'active' : ''}" onclick="setCategory('${c.value}')">${c.icon} ${c.name}</div>`
+  ).join('');
+}
+
+function setCategory(v) { activeCategory = v; renderCategories(); renderCards(); }
+
+function renderCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const area = document.getElementById('areaFilter').value;
+  const sort = document.getElementById('sortBy').value;
+
+  let list = therapists.filter(t => {
+    if (activeCategory !== 'all' && t.cat !== activeCategory) return false;
+    if (area && t.area !== area) return false;
+    if (q && !(t.name.toLowerCase().includes(q) || t.speciality.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  if (sort === 'rating') list.sort((a,b) => b.rating - a.rating);
+  if (sort === 'price-low') list.sort((a,b) => a.price - b.price);
+  if (sort === 'price-high') list.sort((a,b) => b.price - a.price);
+  if (sort === 'reviews') list.sort((a,b) => b.reviews - a.reviews);
+
+  document.getElementById('resultCount').textContent = `${list.length} resultados`;
+
+  document.getElementById('grid').innerHTML = list.map(t => `
+    <div class="card">
+      <div class="card-img">
+        ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
+        <div class="avatar">${t.initial}</div>
+      </div>
+      <div class="card-body">
+        <h3>${t.name}</h3>
+        <div class="speciality">${t.speciality}</div>
+        <div class="info-row">
+          <div>📍 ${t.area}</div>
+          <div>⏱ ${t.exp} anos exp.</div>
+          ${t.online ? '<div>💻 Online</div>' : ''}
+        </div>
+        <div class="rating">
+          <div class="stars">★★★★★</div>
+          <div class="rating-num">${t.rating}</div>
+          <div class="reviews-count">(${t.reviews} avaliações)</div>
+        </div>
+        <div class="price">R$${t.price} <small>/ sessão</small></div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-outline">Ver perfil</button>
+        <button class="btn-book" onclick="openModal(${JSON.stringify(t.name).replace(/"/g, '&quot;')})">Agendar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(name) {
+  selectedTherapist = name;
+  document.getElementById('modalTitle').textContent = `Agendar sessão com ${name}`;
+  document.getElementById('modalSub').textContent = 'Preencha seus dados e escolha um horário disponível';
+  document.getElementById('modal').classList.add('active');
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  document.querySelectorAll('.slot').forEach(s => s.onclick = () => {
+    document.querySelectorAll('.slot').forEach(x => x.classList.remove('selected'));
+    s.classList.add('selected');
+  });
+}
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
+function confirmBooking() {
+  alert(`Sua sessão com ${selectedTherapist} foi agendada! Você receberá a confirmação por email.`);
+  closeModal();
+}
+
+renderCategories();
+renderCards();
+</script>
+</body>
+</html>

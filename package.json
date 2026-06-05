@@ -1,0 +1,10 @@
+{
+  "name": "merhav-therapist-board",
+  "version": "0.1.0",
+  "description": "Multilingual therapist marketplace prototype (HE/EN/PT)",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "deploy": "vercel --prod"
+  }
+}
