@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeraBoard — למטפלים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: linear-gradient(180deg, #f7f5f1 0%, #ebe7e0 100%);
+    color: #2c2a26; min-height: 100vh;
+  }
+  header {
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    position: sticky; top: 0; z-index: 100; padding: 18px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; color: #3a5a4a; text-decoration: none; }
+  .logo-mark { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #7ba990, #3a5a4a); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+  nav { display: flex; gap: 20px; align-items: center; }
+  nav a { color: #555; text-decoration: none; font-weight: 500; font-size: 15px; }
+  nav a:hover { color: #3a5a4a; }
+  .btn-primary { background: #3a5a4a; color: white; padding: 10px 22px; border-radius: 100px; border: none; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  .btn-primary:hover { background: #2c4538; }
+  .btn-ghost { background: transparent; color: #3a5a4a; border: 1px solid #d6d2cb; padding: 9px 18px; border-radius: 100px; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 50px 24px 90px; }
+  .hero-h { text-align: center; margin-bottom: 36px; }
+  .hero-h h1 { font-size: 38px; font-weight: 800; color: #1f2e26; line-height: 1.2; margin-bottom: 14px; }
+  .hero-h h1 span { color: #7ba990; }
+  .hero-h p { font-size: 17px; color: #6b6862; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+  .card-box { background: white; border-radius: 22px; padding: 32px; box-shadow: 0 10px 40px rgba(58,90,74,0.08); border: 1px solid rgba(0,0,0,0.04); margin-bottom: 24px; }
+  .card-box h2 { font-size: 20px; color: #1f2e26; margin-bottom: 4px; }
+  .card-box .sub { color: #6b6862; font-size: 14px; margin-bottom: 22px; }
+
+  .form-row { margin-bottom: 16px; }
+  .form-row label { display: block; font-size: 13px; color: #4a4844; margin-bottom: 6px; font-weight: 600; }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; padding: 12px 14px; border: 1px solid #e6e2db; border-radius: 10px;
+    font-family: inherit; font-size: 14px; outline: none; background: white; color: #2c2a26;
+  }
+  .form-row textarea { min-height: 90px; resize: vertical; }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: #7ba990; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .check { display: flex; align-items: center; gap: 8px; }
+  .check input { width: auto; }
+  .btn-full { width: 100%; background: #3a5a4a; color: white; border: none; padding: 14px; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+  .btn-full:hover { background: #2c4538; }
+  .btn-full:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 22px; background: #f0ede7; padding: 5px; border-radius: 100px; }
+  .tab { flex: 1; text-align: center; padding: 10px; border-radius: 100px; font-weight: 600; font-size: 14px; cursor: pointer; color: #6b6862; }
+  .tab.active { background: white; color: #3a5a4a; }
+
+  .note { font-size: 13px; padding: 12px 14px; border-radius: 10px; margin-bottom: 18px; line-height: 1.5; }
+  .note.warn { background: #fff7e6; color: #8a6d1f; border: 1px solid #f0e0b0; }
+  .note.ok   { background: #eaf3ee; color: #2c5a42; border: 1px solid #c9d8cd; }
+  .note.err  { background: #fbeaea; color: #8a2f2f; border: 1px solid #f0c0c0; }
+
+  .hidden { display: none; }
+  .muted { color: #9b9892; font-size: 13px; }
+
+  .booking-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0ede7; }
+  .booking-item:last-child { border-bottom: none; }
+  .booking-item .who { font-weight: 600; color: #1f2e26; }
+  .status { font-size: 12px; padding: 4px 10px; border-radius: 100px; font-weight: 600; }
+  .status.pending { background: #fff7e6; color: #8a6d1f; }
+  .status.confirmed { background: #eaf3ee; color: #2c5a42; }
+  .status.cancelled { background: #f0ede7; color: #9b9892; }
+
+  @media (max-width: 720px) {
+    header { padding: 14px 20px; }
+    nav a { display: none; }
+    .row-2 { grid-template-columns: 1fr; }
+    .hero-h h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="therapist-board.html">
+    <div class="logo-mark">T</div>
+    TeraBoard
+  </a>
+  <nav>
+    <a href="therapist-board.html">מצא מטפל</a>
+    <span id="navAuth"></span>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="hero-h">
+    <h1>הצטרף ל<span>TeraBoard</span> כמטפל/ת</h1>
+    <p>בנה פרופיל מקצועי, קבל פניות ממטופלים חדשים, ונהל את היומן וההזמנות שלך — במקום אחד.</p>
+  </div>
+
+  <div id="offlineNote" class="note warn hidden">
+    ⚠️ ה-backend עדיין לא מחובר (חסרים מפתחות Supabase ב-<code>js/config.js</code>). הטופס מוצג לתצוגה בלבד — הרשמה אמיתית תעבוד מיד לאחר חיבור המפתחות.
+  </div>
+
+  <!-- ===== AUTH (logged out) ===== -->
+  <div id="authSection" class="card-box">
+    <div class="tabs">
+      <div class="tab active" id="tabSignup" onclick="setTab('signup')">הרשמה</div>
+      <div class="tab" id="tabLogin" onclick="setTab('login')">כניסה</div>
+    </div>
+    <div id="authMsg"></div>
+    <div class="form-row">
+      <label>אימייל</label>
+      <input type="email" id="authEmail" placeholder="you@example.com">
+    </div>
+    <div class="form-row">
+      <label>סיסמה</label>
+      <input type="password" id="authPassword" placeholder="לפחות 6 תווים">
+    </div>
+    <button class="btn-full" id="authBtn" onclick="doAuth()">צור חשבון</button>
+  </div>
+
+  <!-- ===== DASHBOARD (logged in) ===== -->
+  <div id="dashSection" class="hidden">
+    <div class="card-box">
+      <h2>הפרופיל שלי</h2>
+      <p class="sub">המידע הזה יוצג למטופלים בלוח המטפלים.</p>
+      <div id="profileMsg"></div>
+      <div class="form-row">
+        <label>שם מלא</label>
+        <input type="text" id="pName" placeholder="ד״ר ישראלה ישראלי">
+      </div>
+      <div class="form-row">
+        <label>התמחות / תיאור קצר</label>
+        <input type="text" id="pSpeciality" placeholder="פסיכולוגית קלינית, CBT">
+      </div>
+      <div class="row-2">
+        <div class="form-row">
+          <label>קטגוריה</label>
+          <select id="pCategory">
+            <option value="psy">פסיכותרפיה</option>
+            <option value="couple">זוגיות</option>
+            <option value="kids">ילדים ונוער</option>
+            <option value="cbt">CBT</option>
+            <option value="art">אמנות</option>
+            <option value="body">גוף-נפש</option>
+            <option value="addiction">התמכרויות</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>אזור</label>
+          <input type="text" id="pArea" placeholder="תל אביב">
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="form-row">
+          <label>מחיר לפגישה (₪)</label>
+          <input type="number" id="pPrice" placeholder="400">
+        </div>
+        <div class="form-row">
+          <label>שנות ניסיון</label>
+          <input type="number" id="pExp" placeholder="8">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>על עצמי (ביו)</label>
+        <textarea id="pBio" placeholder="ספר/י על הגישה הטיפולית, תחומי ההתמחות והניסיון שלך…"></textarea>
+      </div>
+      <div class="form-row">
+        <label>מספר רישיון</label>
+        <input type="text" id="pLicense" placeholder="מספר רישיון משרד הבריאות">
+      </div>
+      <div class="form-row check">
+        <input type="checkbox" id="pOnline">
+        <label for="pOnline" style="margin:0;">זמין/ה גם לטיפול אונליין</label>
+      </div>
+      <div class="form-row">
+        <label>העלאת רישיון / תעודות (לאימות ידני)</label>
+        <input type="file" id="pLicenseFile" accept="image/*,application/pdf">
+        <div class="muted" id="licenseStatus" style="margin-top:6px;"></div>
+      </div>
+      <button class="btn-full" id="saveBtn" onclick="saveProfile()">שמור פרופיל</button>
+    </div>
+
+    <div class="card-box">
+      <h2>ההזמנות שלי</h2>
+      <p class="sub">פניות שהתקבלו מהלוח.</p>
+      <div id="bookingsList"><div class="muted">טוען…</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+const cfg = window.TERABOARD_CONFIG || {};
+const configured = Boolean(cfg.supabaseUrl && cfg.supabaseAnonKey);
+const sb = (configured && window.supabase)
+  ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey)
+  : null;
+
+let authMode = 'signup';
+let me = null;            // current auth user
+let myTherapist = null;   // current therapist row
+
+function setTab(mode) {
+  authMode = mode;
+  document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('authBtn').textContent = mode === 'signup' ? 'צור חשבון' : 'כניסה';
+  setMsg('authMsg', '');
+}
+
+function setMsg(id, html, kind) {
+  document.getElementById(id).innerHTML = html ? `<div class="note ${kind||'ok'}">${html}</div>` : '';
+}
+
+async function doAuth() {
+  if (!sb) { setMsg('authMsg', 'ה-backend לא מחובר עדיין.', 'warn'); return; }
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if (!email || !password) { setMsg('authMsg', 'נא למלא אימייל וסיסמה.', 'err'); return; }
+  const btn = document.getElementById('authBtn'); btn.disabled = true;
+  try {
+    let res;
+    if (authMode === 'signup') {
+      res = await sb.auth.signUp({ email, password });
+      if (res.error) throw res.error;
+      if (!res.data.session) {
+        setMsg('authMsg', 'נשלח אליך מייל לאימות הכתובת. אשר אותו ואז התחבר.', 'ok');
+        btn.disabled = false; return;
+      }
+    } else {
+      res = await sb.auth.signInWithPassword({ email, password });
+      if (res.error) throw res.error;
+    }
+    await loadSession();
+  } catch (e) {
+    setMsg('authMsg', e.message || 'אירעה שגיאה.', 'err');
+  } finally { btn.disabled = false; }
+}
+
+async function logout() { if (sb) await sb.auth.signOut(); me = null; myTherapist = null; render(); }
+
+async function loadSession() {
+  if (!sb) { render(); return; }
+  const { data } = await sb.auth.getUser();
+  me = data ? data.user : null;
+  if (me) {
+    const { data: rows } = await sb.from('therapists').select('*').eq('user_id', me.id).limit(1);
+    myTherapist = rows && rows[0] ? rows[0] : null;
+  }
+  render();
+}
+
+function render() {
+  const loggedIn = Boolean(me);
+  document.getElementById('authSection').classList.toggle('hidden', loggedIn);
+  document.getElementById('dashSection').classList.toggle('hidden', !loggedIn);
+  document.getElementById('offlineNote').classList.toggle('hidden', configured);
+  document.getElementById('navAuth').innerHTML = loggedIn
+    ? `<a href="#" onclick="logout();return false;">התנתק (${me.email})</a>`
+    : '';
+  if (loggedIn) { fillProfile(); loadBookings(); }
+}
+
+function fillProfile() {
+  const t = myTherapist || {};
+  pName.value = t.name || '';
+  pSpeciality.value = t.speciality || '';
+  pCategory.value = t.category || 'psy';
+  pArea.value = t.area || '';
+  pPrice.value = t.price || '';
+  pExp.value = t.exp || '';
+  pBio.value = t.bio || '';
+  pLicense.value = t.license_number || '';
+  pOnline.checked = Boolean(t.online);
+}
+
+async function uploadLicense() {
+  const file = document.getElementById('pLicenseFile').files[0];
+  if (!file || !sb || !me) return null;
+  const path = `${me.id}/${Date.now()}-${file.name}`;
+  document.getElementById('licenseStatus').textContent = 'מעלה קובץ…';
+  const { error } = await sb.storage.from('licenses').upload(path, file, { upsert: true });
+  if (error) { document.getElementById('licenseStatus').textContent = 'העלאה נכשלה: ' + error.message; return null; }
+  document.getElementById('licenseStatus').textContent = '✓ הקובץ הועלה לאימות.';
+  return path;
+}
+
+async function saveProfile() {
+  if (!sb || !me) { setMsg('profileMsg', 'ה-backend לא מחובר עדיין.', 'warn'); return; }
+  const btn = document.getElementById('saveBtn'); btn.disabled = true;
+  try {
+    const licensePath = await uploadLicense();
+    const payload = {
+      user_id: me.id,
+      name: pName.value.trim(),
+      speciality: pSpeciality.value.trim(),
+      category: pCategory.value,
+      area: pArea.value.trim(),
+      price: parseInt(pPrice.value || '0', 10),
+      exp: parseInt(pExp.value || '0', 10),
+      bio: pBio.value.trim(),
+      license_number: pLicense.value.trim(),
+      online: pOnline.checked,
+      initial: (pName.value.trim()[0] || 'T'),
+    };
+    if (licensePath) payload.photo_url = myTherapist ? myTherapist.photo_url : null; // keep existing photo
+    let res;
+    if (myTherapist) {
+      res = await sb.from('therapists').update(payload).eq('id', myTherapist.id).select().single();
+    } else {
+      res = await sb.from('therapists').insert(payload).select().single();
+    }
+    if (res.error) throw res.error;
+    myTherapist = res.data;
+    setMsg('profileMsg', 'הפרופיל נשמר! הוא יופיע בלוח לאחר אימות הרישיון.', 'ok');
+  } catch (e) {
+    setMsg('profileMsg', e.message || 'שמירה נכשלה.', 'err');
+  } finally { btn.disabled = false; }
+}
+
+async function loadBookings() {
+  const box = document.getElementById('bookingsList');
+  if (!sb || !myTherapist) { box.innerHTML = '<div class="muted">לאחר שמירת הפרופיל, פניות חדשות יופיעו כאן.</div>'; return; }
+  const { data, error } = await sb.from('bookings').select('*').eq('therapist_id', myTherapist.id).order('created_at', { ascending: false });
+  if (error || !data || !data.length) { box.innerHTML = '<div class="muted">אין הזמנות עדיין.</div>'; return; }
+  const labels = { pending: 'ממתין', confirmed: 'מאושר', cancelled: 'בוטל' };
+  box.innerHTML = data.map(b => `
+    <div class="booking-item">
+      <div>
+        <div class="who">${b.full_name || 'מטופל/ת'} ${b.phone ? '· ' + b.phone : ''}</div>
+        <div class="muted">${b.type || ''} ${b.notes ? '· ' + b.notes : ''}</div>
+      </div>
+      <span class="status ${b.status}">${labels[b.status] || b.status}</span>
+    </div>
+  `).join('');
+}
+
+// boot
+if (sb) {
+  sb.auth.onAuthStateChange(() => loadSession());
+  loadSession();
+} else {
+  render();
+}
+</script>
+</body>
+</html>

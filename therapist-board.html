@@ -218,14 +218,14 @@
   <nav>
     <a href="#">מצא מטפל</a>
     <a href="#">איך זה עובד</a>
-    <a href="#">למטפלים</a>
+    <a href="for-therapists.html">למטפלים</a>
     <a href="#">בלוג</a>
     <div class="lang-switch">
       <a href="#" class="active">HE</a>
       <a href="therapist-board-en.html">EN</a>
       <a href="therapist-board-pt.html">PT</a>
     </div>
-    <button class="btn-primary">הרשמה</button>
+    <button class="btn-primary" onclick="location.href='for-therapists.html'">הרשמה</button>
   </nav>
 </header>
 
@@ -303,6 +303,10 @@
   </div>
 </div>
 
+<!-- Supabase client + TeraBoard data layer -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
 <script>
 const categories = [
   { icon: '🧠', name: 'הכל', value: 'all' },
@@ -315,7 +319,7 @@ const categories = [
   { icon: '💊', name: 'התמכרויות', value: 'addiction' }
 ];
 
-const therapists = [
+let therapists = [
   { name: 'ד״ר נועה לוי', speciality: 'פסיכולוגית קלינית', cat: 'psy', area: 'תל אביב', online: true, rating: 4.9, reviews: 142, price: 450, exp: 12, initial: 'נ', badge: 'מומלץ' },
   { name: 'יואב כהן', speciality: 'מטפל זוגי וקבוצתי', cat: 'couple', area: 'ירושלים', online: true, rating: 4.8, reviews: 89, price: 380, exp: 8, initial: 'י' },
   { name: 'ד״ר שירה אברהם', speciality: 'CBT והפרעות חרדה', cat: 'cbt', area: 'תל אביב', online: false, rating: 5.0, reviews: 56, price: 500, exp: 15, initial: 'ש', badge: 'חדש' },
@@ -332,6 +336,8 @@ const therapists = [
 
 let activeCategory = 'all';
 let selectedTherapist = null;
+let selectedTherapistId = null;
+let currentList = [];
 
 function renderCategories() {
   document.getElementById('categories').innerHTML = categories.map(c =>
@@ -359,6 +365,12 @@ function renderCards() {
   if (sort === 'reviews') list.sort((a,b) => b.reviews - a.reviews);
 
   document.getElementById('resultCount').textContent = `${list.length} תוצאות`;
+  currentList = list;
+
+  if (!list.length) {
+    document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#6b6862;padding:60px 20px;font-size:16px;">לא נמצאו מטפלים התואמים את החיפוש.</div>';
+    return;
+  }
 
   document.getElementById('grid').innerHTML = list.map((t, i) => `
     <div class="card">
@@ -383,15 +395,17 @@ function renderCards() {
       </div>
       <div class="card-footer">
         <button class="btn-outline">פרופיל מלא</button>
-        <button class="btn-book" onclick="openModal(${list.indexOf(t)}, ${JSON.stringify(t.name).replace(/"/g, '&quot;')})">תיאום פגישה</button>
+        <button class="btn-book" onclick="openModal(${i})">תיאום פגישה</button>
       </div>
     </div>
   `).join('');
 }
 
-function openModal(idx, name) {
-  selectedTherapist = name;
-  document.getElementById('modalTitle').textContent = `תיאום פגישה עם ${name}`;
+function openModal(idx) {
+  const t = currentList[idx];
+  selectedTherapist = t.name;
+  selectedTherapistId = t.id || null;
+  document.getElementById('modalTitle').textContent = `תיאום פגישה עם ${t.name}`;
   document.getElementById('modalSub').textContent = 'בחר את הפרטים שלך ושעה זמינה';
   document.getElementById('modal').classList.add('active');
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
@@ -401,13 +415,32 @@ function openModal(idx, name) {
   });
 }
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
-function confirmBooking() {
+async function confirmBooking() {
+  const m = document.getElementById('modal');
+  const name = m.querySelector('input[type=text]').value;
+  const phone = m.querySelector('input[type=tel]').value;
+  const type = m.querySelector('select').value;
+  const slotEl = m.querySelector('.slot.selected');
+  await TeraData.createBooking({
+    therapist_id: selectedTherapistId,
+    full_name: name || null,
+    phone: phone || null,
+    type,
+    notes: slotEl ? ('שעה מבוקשת: ' + slotEl.textContent) : null,
+    status: 'pending'
+  });
   alert(`הפגישה עם ${selectedTherapist} תואמה בהצלחה! נשלח אליך אישור במייל.`);
   closeModal();
 }
 
-renderCategories();
-renderCards();
+async function boot() {
+  renderCategories();
+  document.getElementById('grid').innerHTML =
+    '<div style="grid-column:1/-1;text-align:center;color:#6b6862;padding:60px 20px;font-size:16px;">טוען מטפלים…</div>';
+  therapists = await TeraData.getTherapists(therapists);
+  renderCards();
+}
+boot();
 </script>
 </body>
 </html>

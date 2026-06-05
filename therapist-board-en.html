@@ -209,14 +209,14 @@
   <nav>
     <a href="#">Find a therapist</a>
     <a href="#">How it works</a>
-    <a href="#">For therapists</a>
+    <a href="for-therapists.html">For therapists</a>
     <a href="#">Blog</a>
     <div class="lang-switch">
       <a href="therapist-board.html">HE</a>
       <a href="#" class="active">EN</a>
       <a href="therapist-board-pt.html">PT</a>
     </div>
-    <button class="btn-primary">Sign up</button>
+    <button class="btn-primary" onclick="location.href='for-therapists.html'">Sign up</button>
   </nav>
 </header>
 
@@ -293,6 +293,10 @@
   </div>
 </div>
 
+<!-- Supabase client + TeraBoard data layer -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
 <script>
 const categories = [
   { icon: '🧠', name: 'All', value: 'all' },
@@ -305,7 +309,7 @@ const categories = [
   { icon: '💊', name: 'Addiction', value: 'addiction' }
 ];
 
-const therapists = [
+let therapists = [
   { name: 'Dr. Naomi Levi', speciality: 'Clinical Psychologist', cat: 'psy', area: 'New York', online: true, rating: 4.9, reviews: 142, price: 180, exp: 12, initial: 'N', badge: 'Recommended' },
   { name: 'Yoav Cohen', speciality: 'Couples & Group Therapist', cat: 'couple', area: 'London', online: true, rating: 4.8, reviews: 89, price: 150, exp: 8, initial: 'Y' },
   { name: 'Dr. Shira Abraham', speciality: 'CBT & Anxiety Disorders', cat: 'cbt', area: 'New York', online: false, rating: 5.0, reviews: 56, price: 200, exp: 15, initial: 'S', badge: 'New' },
@@ -322,6 +326,8 @@ const therapists = [
 
 let activeCategory = 'all';
 let selectedTherapist = null;
+let selectedTherapistId = null;
+let currentList = [];
 
 function renderCategories() {
   document.getElementById('categories').innerHTML = categories.map(c =>
@@ -349,8 +355,14 @@ function renderCards() {
   if (sort === 'reviews') list.sort((a,b) => b.reviews - a.reviews);
 
   document.getElementById('resultCount').textContent = `${list.length} results`;
+  currentList = list;
 
-  document.getElementById('grid').innerHTML = list.map(t => `
+  if (!list.length) {
+    document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#6b6862;padding:60px 20px;font-size:16px;">No therapists match your search.</div>';
+    return;
+  }
+
+  document.getElementById('grid').innerHTML = list.map((t, i) => `
     <div class="card">
       <div class="card-img">
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
@@ -373,15 +385,17 @@ function renderCards() {
       </div>
       <div class="card-footer">
         <button class="btn-outline">View profile</button>
-        <button class="btn-book" onclick="openModal(${JSON.stringify(t.name).replace(/"/g, '&quot;')})">Book session</button>
+        <button class="btn-book" onclick="openModal(${i})">Book session</button>
       </div>
     </div>
   `).join('');
 }
 
-function openModal(name) {
-  selectedTherapist = name;
-  document.getElementById('modalTitle').textContent = `Book a session with ${name}`;
+function openModal(idx) {
+  const t = currentList[idx];
+  selectedTherapist = t.name;
+  selectedTherapistId = t.id || null;
+  document.getElementById('modalTitle').textContent = `Book a session with ${t.name}`;
   document.getElementById('modalSub').textContent = 'Enter your details and pick an available time';
   document.getElementById('modal').classList.add('active');
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
@@ -391,13 +405,32 @@ function openModal(name) {
   });
 }
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
-function confirmBooking() {
+async function confirmBooking() {
+  const m = document.getElementById('modal');
+  const name = m.querySelector('input[type=text]').value;
+  const phone = m.querySelector('input[type=tel]').value;
+  const type = m.querySelector('select').value;
+  const slotEl = m.querySelector('.slot.selected');
+  await TeraData.createBooking({
+    therapist_id: selectedTherapistId,
+    full_name: name || null,
+    phone: phone || null,
+    type,
+    notes: slotEl ? ('Requested time: ' + slotEl.textContent) : null,
+    status: 'pending'
+  });
   alert(`Your session with ${selectedTherapist} is booked! A confirmation will be sent to your email.`);
   closeModal();
 }
 
-renderCategories();
-renderCards();
+async function boot() {
+  renderCategories();
+  document.getElementById('grid').innerHTML =
+    '<div style="grid-column:1/-1;text-align:center;color:#6b6862;padding:60px 20px;font-size:16px;">Loading therapists…</div>';
+  therapists = await TeraData.getTherapists(therapists);
+  renderCards();
+}
+boot();
 </script>
 </body>
 </html>
