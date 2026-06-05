@@ -1,4 +1,4 @@
-# Merhav (מרחב) — Therapist Marketplace
+# TeraBoard — Therapist Marketplace
 
 Multilingual web platform connecting users with licensed therapists.
 
