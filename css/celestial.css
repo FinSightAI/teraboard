@@ -253,6 +253,48 @@ nav a:hover { color: var(--violet); }
 .status.confirmed { background: #efe9fb; color: var(--violet-d); }
 .status.cancelled { background: #efeaf6; color: var(--ink-soft); }
 
+/* ---------- Card entrance animation (staggered on load) ---------- */
+@keyframes tb-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.card { animation: tb-rise 0.5s cubic-bezier(.2,.7,.3,1) both; }
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } }
+
+/* ============================================================
+   Therapist profile page (/therapist/[id])
+   ============================================================ */
+.profile-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 96px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-soft); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 18px; }
+.back-link:hover { color: var(--violet); }
+.profile-top {
+  display: flex; gap: 28px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card);
+  padding: 34px; box-shadow: var(--shadow-soft); position: relative; overflow: hidden;
+}
+.profile-top::after { content: ""; position: absolute; top: -10px; inset-inline-end: -10px; width: 150px; height: 116px; background: var(--motif) center/contain no-repeat; opacity: 0.10; }
+.profile-avatar {
+  width: 116px; height: 116px; border-radius: 50%; flex: 0 0 auto; z-index: 1;
+  background: linear-gradient(140deg, #b29fe6, #46347e);
+  color: #fff; font-family: var(--font-display); font-size: 46px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 26px rgba(70,52,126,0.38);
+}
+.profile-id { z-index: 1; }
+.profile-id h1 { font-family: var(--font-display); font-weight: 600; font-size: 40px; color: var(--ink); line-height: 1.08; }
+.profile-id .speciality { font-size: 16px; margin-top: 4px; margin-bottom: 0; }
+.verified-tag { display: inline-flex; align-items: center; gap: 5px; color: #2f7d57; background: #e7f4ec; border: 1px solid #c6e6d4; padding: 4px 12px; border-radius: var(--r-pill); font-size: 12px; font-weight: 700; margin-top: 10px; }
+.pill-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 4px; }
+.pill { background: #f3eefb; color: var(--violet-d); border: 1px solid var(--line); padding: 8px 14px; border-radius: var(--r-pill); font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; }
+.profile-meta { display: flex; align-items: center; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
+.profile-price { font-family: var(--font-display); font-size: 28px; color: var(--ink); font-weight: 600; }
+.profile-price small { font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+.profile-section { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 28px 32px; margin-top: 22px; box-shadow: 0 12px 34px rgba(58,43,99,0.06); }
+.profile-section h2 { font-family: var(--font-display); font-weight: 600; font-size: 25px; margin-bottom: 14px; color: var(--ink); }
+.bio { color: var(--ink-soft); line-height: 1.85; font-size: 15px; white-space: pre-wrap; }
+.review { border-bottom: 1px solid var(--line); padding: 14px 0; }
+.review:last-child { border-bottom: none; }
+.review .stars { margin-bottom: 4px; }
+.review .r-comment { color: var(--ink); font-size: 14px; line-height: 1.6; }
+.book-cta { margin-top: 18px; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
   header { padding: 14px 20px; }
@@ -266,4 +308,7 @@ nav a:hover { color: var(--violet); }
   .search-btn { width: 100%; }
   .listings { padding: 20px; }
   .row-2 { grid-template-columns: 1fr; }
+  .profile-top { flex-direction: column; align-items: center; text-align: center; }
+  .profile-id h1 { font-size: 32px; }
+  .pill-row, .profile-meta { justify-content: center; }
 }

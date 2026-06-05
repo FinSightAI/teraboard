@@ -5,5 +5,8 @@
     { "source": "/he", "destination": "/therapist-board.html" },
     { "source": "/en", "destination": "/therapist-board-en.html" },
     { "source": "/pt", "destination": "/therapist-board-pt.html" }
+  ],
+  "rewrites": [
+    { "source": "/therapist/:id", "destination": "/therapist.html?id=:id" }
   ]
 }

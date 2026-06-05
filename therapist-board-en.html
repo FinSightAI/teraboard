@@ -171,7 +171,7 @@ function renderCards() {
   }
 
   document.getElementById('grid').innerHTML = list.map((t, i) => `
-    <div class="card">
+    <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
         <div class="avatar">${t.initial}</div>
@@ -193,7 +193,7 @@ function renderCards() {
         <div class="price">$${t.price} <small>/ session</small></div>
       </div>
       <div class="card-footer">
-        <button class="btn-outline">View profile</button>
+        <button class="btn-outline" onclick="viewProfile(${i})">View profile</button>
         <button class="btn-book" onclick="openModal(${i})">Book session</button>
       </div>
     </div>
@@ -214,6 +214,8 @@ function openModal(idx) {
   });
 }
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
+function viewProfile(i){ const t=currentList[i]; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',document.documentElement.lang||'he'); location.href='therapist.html'+(t.id?('?id='+encodeURIComponent(t.id)):''); }
+
 async function confirmBooking() {
   const m = document.getElementById('modal');
   const name = m.querySelector('input[type=text]').value;
