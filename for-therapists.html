@@ -123,6 +123,8 @@
     <div class="card-box">
       <h2 data-i18n="bookingsTitle"></h2>
       <p class="sub" data-i18n="bookingsSub"></p>
+      <div id="leadStats" class="lead-stats"></div>
+      <p class="roi-hint" data-i18n="roiHint"></p>
       <div id="bookingsList"></div>
     </div>
   </div>
@@ -144,7 +146,7 @@ const STR = {
     bio:'על עצמי (ביו)', bioPh:'ספר/י על הגישה הטיפולית, ההתמחות והניסיון שלך…', license:'מספר רישיון', licensePh:'מספר רישיון משרד הבריאות',
     website:'אתר אישי', instagram:'אינסטגרם', shownToClients:'(יוצג למטופלים)', onlineLabel:'זמין/ה גם לטיפול אונליין',
     licenseUpload:'העלאת רישיון / תעודות (לאימות ידני)', save:'שמור פרופיל',
-    bookingsTitle:'ההזמנות שלי', bookingsSub:'פניות שהתקבלו מהלוח.', bookingsEmpty:'אין הזמנות עדיין.', noProfileYet:'לאחר שמירת הפרופיל, פניות חדשות יופיעו כאן.', loading:'טוען…',
+    bookingsTitle:'ההזמנות שלי', bookingsSub:'פניות שהתקבלו מהלוח.', bookingsEmpty:'אין הזמנות עדיין.', noProfileYet:'לאחר שמירת הפרופיל, פניות חדשות יופיעו כאן.', loading:'טוען…', statMonth:'פניות החודש', statTotal:'סה״כ פניות', statPending:'ממתינות', roiHint:'כל פנייה היא ליד שהגיע אליך דרך TeraBoard.',
     logout:e=>`התנתק (${e})`, st:{pending:'ממתין',confirmed:'מאושר',cancelled:'בוטל'}, client:'מטופל/ת',
     backendOff:'ה-backend לא מחובר עדיין.', fillEmail:'נא למלא אימייל וסיסמה.', confirmMail:'נשלח אליך מייל לאימות. אשר/י אותו ואז התחבר/י.',
     saved:'הפרופיל נשמר! יופיע בלוח לאחר אימות הרישיון.', saveFail:'שמירה נכשלה.', authFail:'אירעה שגיאה.',
@@ -159,7 +161,7 @@ const STR = {
     bio:'About me (bio)', bioPh:'Tell clients about your therapeutic approach, specialties and experience…', license:'License number', licensePh:'Professional license number',
     website:'Website', instagram:'Instagram', shownToClients:'(shown to clients)', onlineLabel:'Also available for online sessions',
     licenseUpload:'Upload license / credentials (for manual verification)', save:'Save profile',
-    bookingsTitle:'My bookings', bookingsSub:'Inquiries received from the board.', bookingsEmpty:'No bookings yet.', noProfileYet:'After you save your profile, new inquiries will appear here.', loading:'Loading…',
+    bookingsTitle:'My bookings', bookingsSub:'Inquiries received from the board.', bookingsEmpty:'No bookings yet.', noProfileYet:'After you save your profile, new inquiries will appear here.', loading:'Loading…', statMonth:'Leads this month', statTotal:'Total leads', statPending:'Pending', roiHint:'Every inquiry is a lead TeraBoard sent you.',
     logout:e=>`Log out (${e})`, st:{pending:'Pending',confirmed:'Confirmed',cancelled:'Cancelled'}, client:'Client',
     backendOff:'Backend not connected yet.', fillEmail:'Please enter email and password.', confirmMail:'A verification email was sent. Confirm it, then log in.',
     saved:'Profile saved! It will appear on the board after license verification.', saveFail:'Save failed.', authFail:'An error occurred.',
@@ -174,7 +176,7 @@ const STR = {
     bio:'Sobre mim (bio)', bioPh:'Conte aos pacientes sobre sua abordagem terapêutica, especialidades e experiência…', license:'Número de registro (CRP)', licensePh:'Número do registro profissional',
     website:'Site', instagram:'Instagram', shownToClients:'(exibido aos pacientes)', onlineLabel:'Também disponível para sessões online',
     licenseUpload:'Enviar registro / credenciais (para verificação manual)', save:'Salvar perfil',
-    bookingsTitle:'Meus agendamentos', bookingsSub:'Contatos recebidos pelo quadro.', bookingsEmpty:'Ainda sem agendamentos.', noProfileYet:'Após salvar seu perfil, novos contatos aparecerão aqui.', loading:'Carregando…',
+    bookingsTitle:'Meus agendamentos', bookingsSub:'Contatos recebidos pelo quadro.', bookingsEmpty:'Ainda sem agendamentos.', noProfileYet:'Após salvar seu perfil, novos contatos aparecerão aqui.', loading:'Carregando…', statMonth:'Contatos no mês', statTotal:'Total de contatos', statPending:'Pendentes', roiHint:'Cada contato é um lead que o TeraBoard trouxe até você.',
     logout:e=>`Sair (${e})`, st:{pending:'Pendente',confirmed:'Confirmado',cancelled:'Cancelado'}, client:'Paciente',
     backendOff:'Backend ainda não conectado.', fillEmail:'Preencha e-mail e senha.', confirmMail:'Um e-mail de verificação foi enviado. Confirme e depois entre.',
     saved:'Perfil salvo! Aparecerá no quadro após a verificação do registro.', saveFail:'Falha ao salvar.', authFail:'Ocorreu um erro.',
@@ -330,12 +332,25 @@ async function saveProfile() {
   finally { btn.disabled = false; }
 }
 
+function renderLeadStats(list) {
+  const now = new Date();
+  const mStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const month = list.filter(b => (b.created_at || '') >= mStart).length;
+  const pending = list.filter(b => b.status === 'pending').length;
+  document.getElementById('leadStats').innerHTML = `
+    <div class="stat-tile accent"><div class="n">${month}</div><div class="l">${T.statMonth}</div></div>
+    <div class="stat-tile"><div class="n">${list.length}</div><div class="l">${T.statTotal}</div></div>
+    <div class="stat-tile"><div class="n">${pending}</div><div class="l">${T.statPending}</div></div>`;
+}
+
 async function loadBookings() {
   const box = document.getElementById('bookingsList');
-  if (!sb || !myTherapist) { box.innerHTML = `<div class="muted">${T.noProfileYet}</div>`; return; }
+  if (!sb || !myTherapist) { document.getElementById('leadStats').innerHTML = ''; box.innerHTML = `<div class="muted">${T.noProfileYet}</div>`; return; }
   const { data } = await sb.from('bookings').select('*').eq('therapist_id', myTherapist.id).order('created_at', { ascending: false });
-  if (!data || !data.length) { box.innerHTML = `<div class="muted">${T.bookingsEmpty}</div>`; return; }
-  box.innerHTML = data.map(b => `
+  const list = data || [];
+  renderLeadStats(list);
+  if (!list.length) { box.innerHTML = `<div class="muted">${T.bookingsEmpty}</div>`; return; }
+  box.innerHTML = list.map(b => `
     <div class="booking-item">
       <div><div class="who">${b.full_name || T.client} ${b.phone ? '· ' + b.phone : ''}</div>
       <div class="muted">${b.type || ''} ${b.notes ? '· ' + b.notes : ''}</div></div>

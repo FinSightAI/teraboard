@@ -295,6 +295,16 @@ nav a:hover { color: var(--violet); }
 .review .r-comment { color: var(--ink); font-size: 14px; line-height: 1.6; }
 .book-cta { margin-top: 18px; }
 
+/* ---------- Lead stats (therapist dashboard) ---------- */
+.lead-stats { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.stat-tile { flex: 1; min-width: 120px; background: linear-gradient(140deg,#f3eefb,#e9e1fb); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.stat-tile .n { font-family: var(--font-display); font-size: 32px; font-weight: 600; color: var(--violet-d); line-height: 1; }
+.stat-tile .l { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
+.stat-tile.accent { background: linear-gradient(140deg,#5e3ea8,#2f1f57); border-color: transparent; }
+.stat-tile.accent .n { color: #fff; }
+.stat-tile.accent .l { color: rgba(255,255,255,0.85); }
+.roi-hint { font-size: 13px; color: var(--ink-soft); margin: 0 0 16px; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
   header { padding: 14px 20px; }
