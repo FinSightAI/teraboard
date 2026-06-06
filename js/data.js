@@ -50,6 +50,8 @@
     // Language-neutral contact links (website + Instagram) for a therapist
     // card. Returns '' when the therapist has neither. Clients can click through.
     contactLinksHTML(t) {
+      const lg = (typeof document!=='undefined' && document.documentElement.lang) || 'he';
+      const siteLabel = ({he:'אתר', en:'Website', pt:'Site'})[lg] || 'Website';
       const w = normWebsite(t.website);
       const ig = normInstagram(t.instagram);
       if (!w && !ig) return "";
@@ -59,7 +61,7 @@
         `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}" onclick="event.stopPropagation()" style="${base}" onmouseover="this.style.background='#c9d8cd'" onmouseout="this.style.background='#f0ede7'">${icon}</a>`;
       return (
         '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
-        (w ? a(w, "Website", "🌐") : "") +
+        (w ? a(w, siteLabel, "🌐") : "") +
         (ig ? a(ig, "Instagram", "📸") : "") +
         "</div>"
       );

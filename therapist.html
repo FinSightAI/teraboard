@@ -13,7 +13,7 @@
 <body>
 
 <header>
-  <a class="logo" href="therapist-board.html">
+  <a class="logo" id="logoLink" href="therapist-board.html">
     <div class="logo-mark">T</div>
     TeraBoard
   </a>
@@ -86,6 +86,9 @@ let therapist = null;
 
 document.documentElement.lang = lang;
 document.documentElement.dir = T.dir;
+const boardHref = 'therapist-board' + (lang==='he'?'':'-'+lang) + '.html';
+document.getElementById('logoLink').href = boardHref;
+document.getElementById('navBack').href = boardHref;
 
 function setText() {
   document.getElementById('navBack').textContent = T.back;
@@ -128,7 +131,7 @@ function render() {
   const t = therapist;
   document.title = `${t.name} — TeraBoard`;
   root.innerHTML = `
-    <a class="back-link" href="therapist-board${lang==='he'?'':'-'+lang}.html">← ${T.back}</a>
+    <a class="back-link" href="${boardHref}">← ${T.back}</a>
     <div class="profile-top">
       ${t.photo ? `<div class="profile-avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="profile-avatar">${esc(t.initial || (t.name||'?')[0])}</div>`}
       <div class="profile-id">

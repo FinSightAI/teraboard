@@ -226,7 +226,7 @@ function openModal(idx) {
   });
 }
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
-function viewProfile(i){ const t=currentList[i]; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',document.documentElement.lang||'he'); location.href=(t.id?('/t/'+encodeURIComponent(t.id)):'therapist.html'); }
+function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
   const m = document.getElementById('modal');
