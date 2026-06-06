@@ -16,15 +16,14 @@
   </div>
   <nav>
     <a href="#">Find a therapist</a>
-    <a href="#">How it works</a>
-    <a href="for-therapists.html">For therapists</a>
-    <a href="#">Blog</a>
+    <a href="how-it-works.html?lang=en">How it works</a>
+    <a href="for-therapists.html?lang=en">For therapists</a>
     <div class="lang-switch">
       <a href="therapist-board.html">HE</a>
       <a href="#" class="active">EN</a>
       <a href="therapist-board-pt.html">PT</a>
     </div>
-    <button class="btn-primary" onclick="location.href='for-therapists.html'">Sign up</button>
+    <button class="btn-primary" onclick="location.href='for-therapists.html?lang=en'">Sign up</button>
   </nav>
 </header>
 
@@ -114,7 +113,13 @@ const categories = [
   { icon: '🌿', name: 'CBT', value: 'cbt' },
   { icon: '🎭', name: 'Art Therapy', value: 'art' },
   { icon: '🧘', name: 'Body-Mind', value: 'body' },
-  { icon: '💊', name: 'Addiction', value: 'addiction' }
+  { icon: '💊', name: 'Addiction', value: 'addiction' },
+  { icon: '🌧️', name: 'Trauma & PTSD', value: 'trauma' },
+  { icon: '👨‍👩‍👧', name: 'Family', value: 'family' },
+  { icon: '🌀', name: 'Anxiety & Depression', value: 'anxiety' },
+  { icon: '🪷', name: 'Mindfulness', value: 'mindfulness' },
+  { icon: '💞', name: 'Sex Therapy', value: 'sexual' },
+  { icon: '🕊️', name: 'Grief & Loss', value: 'grief' }
 ];
 
 let therapists = [
@@ -129,7 +134,13 @@ let therapists = [
   { name: 'Dana Alon', speciality: 'CBT for Teens', cat: 'cbt', area: 'Berlin', online: true, rating: 4.7, reviews: 41, price: 140, exp: 5, initial: 'D' },
   { name: 'Uri Friedman', speciality: 'IMAGO Couples Therapy', cat: 'couple', area: 'New York', online: false, rating: 5.0, reviews: 38, price: 220, exp: 11, initial: 'U', badge: 'New' },
   { name: 'Neta Berger', speciality: 'Art & Trauma Therapy', cat: 'art', area: 'Los Angeles', online: true, rating: 4.8, reviews: 72, price: 135, exp: 10, initial: 'N' },
-  { name: 'Dr. Omer Nachum', speciality: 'Jungian Psychoanalysis', cat: 'psy', area: 'London', online: false, rating: 4.9, reviews: 108, price: 210, exp: 20, initial: 'O', badge: 'Recommended' }
+  { name: 'Dr. Omer Nachum', speciality: 'Jungian Psychoanalysis', cat: 'psy', area: 'London', online: false, rating: 4.9, reviews: 108, price: 210, exp: 20, initial: 'O', badge: 'Recommended' },
+  { name: 'Dr. Liat Mizrahi', speciality: 'Trauma & EMDR', cat: 'trauma', area: 'New York', online: true, rating: 4.9, reviews: 64, price: 200, exp: 16, initial: 'L', photo: 'https://randomuser.me/api/portraits/women/90.jpg' },
+  { name: 'Guy Shapira', speciality: 'Family Therapy', cat: 'family', area: 'London', online: false, rating: 4.8, reviews: 81, price: 170, exp: 12, initial: 'G', photo: 'https://randomuser.me/api/portraits/men/15.jpg' },
+  { name: 'Dr. Maya Gal', speciality: 'Anxiety & Depression', cat: 'anxiety', area: 'New York', online: true, rating: 4.9, reviews: 118, price: 190, exp: 14, initial: 'M', badge: 'Recommended', photo: 'https://randomuser.me/api/portraits/women/56.jpg' },
+  { name: 'Noam Ben-David', speciality: 'Mindfulness & Body-Mind', cat: 'mindfulness', area: 'Online', online: true, rating: 4.8, reviews: 73, price: 120, exp: 8, initial: 'N', photo: 'https://randomuser.me/api/portraits/men/41.jpg' },
+  { name: 'Dr. Anat Levin', speciality: 'Sex Therapy', cat: 'sexual', area: 'Berlin', online: true, rating: 4.9, reviews: 92, price: 210, exp: 15, initial: 'A', badge: 'Recommended', photo: 'https://randomuser.me/api/portraits/women/33.jpg' },
+  { name: 'Doron Avni', speciality: 'Grief & Loss', cat: 'grief', area: 'Los Angeles', online: false, rating: 4.7, reviews: 48, price: 160, exp: 11, initial: 'D', photo: 'https://randomuser.me/api/portraits/men/3.jpg' }
 ];
 
 let activeCategory = 'all';
@@ -174,7 +185,7 @@ function renderCards() {
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
-        <div class="avatar">${t.initial}</div>
+        ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
       </div>
       <div class="card-body">
         <h3>${t.name}</h3>

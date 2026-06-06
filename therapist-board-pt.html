@@ -16,15 +16,14 @@
   </div>
   <nav>
     <a href="#">Encontrar terapeuta</a>
-    <a href="#">Como funciona</a>
-    <a href="for-therapists.html">Para terapeutas</a>
-    <a href="#">Blog</a>
+    <a href="how-it-works.html?lang=pt">Como funciona</a>
+    <a href="for-therapists.html?lang=pt">Para terapeutas</a>
     <div class="lang-switch">
       <a href="therapist-board.html">HE</a>
       <a href="therapist-board-en.html">EN</a>
       <a href="#" class="active">PT</a>
     </div>
-    <button class="btn-primary" onclick="location.href='for-therapists.html'">Cadastrar</button>
+    <button class="btn-primary" onclick="location.href='for-therapists.html?lang=pt'">Cadastrar</button>
   </nav>
 </header>
 
@@ -114,22 +113,30 @@ const categories = [
   { icon: '🌿', name: 'TCC', value: 'cbt' },
   { icon: '🎭', name: 'Arteterapia', value: 'art' },
   { icon: '🧘', name: 'Corpo-Mente', value: 'body' },
-  { icon: '💊', name: 'Dependências', value: 'addiction' }
+  { icon: '💊', name: 'Dependências', value: 'addiction' },
+  { icon: '🌧️', name: 'Trauma e TEPT', value: 'trauma' },
+  { icon: '👨‍👩‍👧', name: 'Família', value: 'family' },
+  { icon: '🌀', name: 'Ansiedade e Depressão', value: 'anxiety' },
+  { icon: '🪷', name: 'Mindfulness', value: 'mindfulness' },
+  { icon: '💞', name: 'Sexologia', value: 'sexual' },
+  { icon: '🕊️', name: 'Luto e Perda', value: 'grief' }
 ];
 
 let therapists = [
-  { name: 'Dra. Naomi Levi', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 142, price: 280, exp: 12, initial: 'N', badge: 'Recomendado', website: 'https://noa-levi.com', instagram: 'noa.levi.psy' },
-  { name: 'Yoav Cohen', speciality: 'Terapeuta de Casais', cat: 'couple', area: 'Lisboa', online: true, rating: 4.8, reviews: 89, price: 240, exp: 8, initial: 'Y' },
-  { name: 'Dra. Shira Abraham', speciality: 'TCC e Transtornos de Ansiedade', cat: 'cbt', area: 'São Paulo', online: false, rating: 5.0, reviews: 56, price: 320, exp: 15, initial: 'S', badge: 'Novo' },
-  { name: 'Michal Barak', speciality: 'Arteterapeuta', cat: 'art', area: 'Porto', online: true, rating: 4.7, reviews: 78, price: 200, exp: 6, initial: 'M' },
-  { name: 'Asaf Rosen', speciality: 'Psicoterapia Psicodinâmica', cat: 'psy', area: 'Rio de Janeiro', online: false, rating: 4.9, reviews: 203, price: 260, exp: 18, initial: 'A', badge: 'Recomendado' },
-  { name: 'Tamar Wiseman', speciality: 'Terapia Emocional Infantil', cat: 'kids', area: 'São Paulo', online: true, rating: 4.8, reviews: 95, price: 220, exp: 9, initial: 'T' },
-  { name: 'Dr. Ronen Stern', speciality: 'Recuperação de Dependências', cat: 'addiction', area: 'Lisboa', online: true, rating: 4.6, reviews: 67, price: 300, exp: 14, initial: 'R' },
-  { name: 'Yael Goldman', speciality: 'Yoga Terapêutica e Corpo-Mente', cat: 'body', area: 'Online', online: true, rating: 4.9, reviews: 124, price: 180, exp: 7, initial: 'Y' },
-  { name: 'Dana Alon', speciality: 'TCC para Adolescentes', cat: 'cbt', area: 'Porto', online: true, rating: 4.7, reviews: 41, price: 220, exp: 5, initial: 'D' },
-  { name: 'Uri Friedman', speciality: 'Terapia IMAGO para Casais', cat: 'couple', area: 'São Paulo', online: false, rating: 5.0, reviews: 38, price: 350, exp: 11, initial: 'U', badge: 'Novo' },
-  { name: 'Neta Berger', speciality: 'Arte e Trauma', cat: 'art', area: 'Rio de Janeiro', online: true, rating: 4.8, reviews: 72, price: 210, exp: 10, initial: 'N' },
-  { name: 'Dr. Omer Nachum', speciality: 'Psicanálise Junguiana', cat: 'psy', area: 'Lisboa', online: false, rating: 4.9, reviews: 108, price: 330, exp: 20, initial: 'O', badge: 'Recomendado' }
+  { name: 'Dra. Mariana Silva', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 168, price: 280, exp: 13, initial: 'M', badge: 'Recomendado', photo: 'https://randomuser.me/api/portraits/women/68.jpg', website: 'https://marianasilva.com.br', instagram: 'mariana.psi' },
+  { name: 'Rafael Oliveira', speciality: 'Terapeuta de Casais', cat: 'couple', area: 'Rio de Janeiro', online: true, rating: 4.8, reviews: 94, price: 240, exp: 9, initial: 'R', photo: 'https://randomuser.me/api/portraits/men/32.jpg' },
+  { name: 'Dra. Camila Santos', speciality: 'TCC e Ansiedade', cat: 'cbt', area: 'São Paulo', online: false, rating: 5.0, reviews: 61, price: 300, exp: 15, initial: 'C', badge: 'Novo', photo: 'https://randomuser.me/api/portraits/women/44.jpg' },
+  { name: 'Juliana Costa', speciality: 'Arteterapeuta', cat: 'art', area: 'Belo Horizonte', online: true, rating: 4.7, reviews: 73, price: 200, exp: 7, initial: 'J', photo: 'https://randomuser.me/api/portraits/women/12.jpg' },
+  { name: 'Bruno Almeida', speciality: 'Psicoterapia Psicodinâmica', cat: 'psy', area: 'Curitiba', online: false, rating: 4.9, reviews: 210, price: 260, exp: 18, initial: 'B', badge: 'Recomendado', photo: 'https://randomuser.me/api/portraits/men/52.jpg' },
+  { name: 'Dra. Patrícia Ferreira', speciality: 'Terapia Infantil', cat: 'kids', area: 'São Paulo', online: true, rating: 4.8, reviews: 88, price: 220, exp: 10, initial: 'P', photo: 'https://randomuser.me/api/portraits/women/29.jpg' },
+  { name: 'Lucas Rodrigues', speciality: 'Recuperação de Dependências', cat: 'addiction', area: 'Rio de Janeiro', online: true, rating: 4.6, reviews: 67, price: 300, exp: 14, initial: 'L', photo: 'https://randomuser.me/api/portraits/men/76.jpg' },
+  { name: 'Fernanda Lima', speciality: 'Mindfulness e Meditação', cat: 'mindfulness', area: 'Online', online: true, rating: 4.9, reviews: 131, price: 180, exp: 8, initial: 'F', photo: 'https://randomuser.me/api/portraits/women/65.jpg', instagram: 'fer.mindful' },
+  { name: 'Dra. Beatriz Carvalho', speciality: 'Trauma e EMDR', cat: 'trauma', area: 'Porto Alegre', online: true, rating: 5.0, reviews: 54, price: 320, exp: 16, initial: 'B', badge: 'Novo', photo: 'https://randomuser.me/api/portraits/women/90.jpg' },
+  { name: 'Thiago Pereira', speciality: 'Terapia Familiar Sistêmica', cat: 'family', area: 'Brasília', online: false, rating: 4.8, reviews: 79, price: 270, exp: 12, initial: 'T', photo: 'https://randomuser.me/api/portraits/men/15.jpg' },
+  { name: 'Dra. Aline Souza', speciality: 'Sexologia Clínica', cat: 'sexual', area: 'São Paulo', online: true, rating: 4.9, reviews: 96, price: 340, exp: 11, initial: 'A', badge: 'Recomendado', photo: 'https://randomuser.me/api/portraits/women/33.jpg', instagram: 'dra.alinesouza' },
+  { name: 'Gabriel Martins', speciality: 'Luto e Perda', cat: 'grief', area: 'Lisboa', online: true, rating: 4.7, reviews: 42, price: 230, exp: 9, initial: 'G', photo: 'https://randomuser.me/api/portraits/men/3.jpg' },
+  { name: 'Dra. Renata Gomes', speciality: 'Ansiedade e Depressão', cat: 'anxiety', area: 'Curitiba', online: true, rating: 4.8, reviews: 115, price: 250, exp: 13, initial: 'R', photo: 'https://randomuser.me/api/portraits/women/56.jpg' },
+  { name: 'Marcelo Ribeiro', speciality: 'Corpo-Mente e Yoga', cat: 'body', area: 'Florianópolis', online: true, rating: 4.9, reviews: 124, price: 190, exp: 7, initial: 'M', photo: 'https://randomuser.me/api/portraits/men/41.jpg', instagram: 'marcelo.corpo' }
 ];
 
 let activeCategory = 'all';
@@ -174,7 +181,7 @@ function renderCards() {
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
-        <div class="avatar">${t.initial}</div>
+        ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
       </div>
       <div class="card-body">
         <h3>${t.name}</h3>

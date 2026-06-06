@@ -3,181 +3,260 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeraBoard — למטפלים</title>
+<title>TeraBoard</title>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/celestial.css">
 </head>
 <body>
 
 <header>
-  <a class="logo" href="therapist-board.html">
+  <a class="logo" id="logoLink" href="therapist-board.html">
     <div class="logo-mark">T</div>
     TeraBoard
   </a>
   <nav>
-    <a href="therapist-board.html">מצא מטפל</a>
+    <a id="navFind" href="therapist-board.html"></a>
     <span id="navAuth"></span>
   </nav>
 </header>
 
 <div class="wrap">
   <div class="hero-h">
-    <h1>הצטרף ל<span>TeraBoard</span> כמטפל/ת</h1>
-    <p>בנה פרופיל מקצועי, קבל פניות ממטופלים חדשים, ונהל את היומן וההזמנות שלך — במקום אחד.</p>
+    <h1 id="heroH"></h1>
+    <p id="heroP"></p>
   </div>
 
-  <div id="offlineNote" class="note warn hidden">
-    ⚠️ ה-backend עדיין לא מחובר (חסרים מפתחות Supabase ב-<code>js/config.js</code>). הטופס מוצג לתצוגה בלבד — הרשמה אמיתית תעבוד מיד לאחר חיבור המפתחות.
-  </div>
+  <div id="offlineNote" class="note warn hidden"></div>
 
   <!-- ===== AUTH (logged out) ===== -->
   <div id="authSection" class="card-box">
     <div class="tabs">
-      <div class="tab active" id="tabSignup" onclick="setTab('signup')">הרשמה</div>
-      <div class="tab" id="tabLogin" onclick="setTab('login')">כניסה</div>
+      <div class="tab active" id="tabSignup" onclick="setTab('signup')"></div>
+      <div class="tab" id="tabLogin" onclick="setTab('login')"></div>
     </div>
     <div id="authMsg"></div>
     <div class="form-row">
-      <label>אימייל</label>
-      <input type="email" id="authEmail" placeholder="you@example.com">
+      <label data-i18n="email"></label>
+      <input type="email" id="authEmail" data-ph="emailPh">
     </div>
     <div class="form-row">
-      <label>סיסמה</label>
-      <input type="password" id="authPassword" placeholder="לפחות 6 תווים">
+      <label data-i18n="password"></label>
+      <input type="password" id="authPassword" data-ph="passPh">
     </div>
-    <button class="btn-full" id="authBtn" onclick="doAuth()">צור חשבון</button>
+    <button class="btn-full" id="authBtn" onclick="doAuth()"></button>
   </div>
 
   <!-- ===== DASHBOARD (logged in) ===== -->
   <div id="dashSection" class="hidden">
     <div class="card-box">
-      <h2>הפרופיל שלי</h2>
-      <p class="sub">המידע הזה יוצג למטופלים בלוח המטפלים.</p>
+      <h2 data-i18n="profileTitle"></h2>
+      <p class="sub" data-i18n="profileSub"></p>
       <div id="profileMsg"></div>
+
+      <div class="form-row" style="display:flex;align-items:center;gap:16px;">
+        <div id="photoPreview" style="width:72px;height:72px;border-radius:50%;flex:0 0 auto;background:linear-gradient(140deg,#8f74cf,#2f1f57);background-size:cover;background-position:center;"></div>
+        <div style="flex:1;">
+          <label data-i18n="photo"></label>
+          <input type="file" id="pPhotoFile" accept="image/*" onchange="previewPhoto()">
+        </div>
+      </div>
+
       <div class="form-row">
-        <label>שם מלא</label>
-        <input type="text" id="pName" placeholder="ד״ר ישראלה ישראלי">
+        <label data-i18n="name"></label>
+        <input type="text" id="pName" data-ph="namePh">
       </div>
       <div class="form-row">
-        <label>התמחות / תיאור קצר</label>
-        <input type="text" id="pSpeciality" placeholder="פסיכולוגית קלינית, CBT">
+        <label data-i18n="speciality"></label>
+        <input type="text" id="pSpeciality" data-ph="specialityPh">
       </div>
       <div class="row-2">
         <div class="form-row">
-          <label>קטגוריה</label>
-          <select id="pCategory">
-            <option value="psy">פסיכותרפיה</option>
-            <option value="couple">זוגיות</option>
-            <option value="kids">ילדים ונוער</option>
-            <option value="cbt">CBT</option>
-            <option value="art">אמנות</option>
-            <option value="body">גוף-נפש</option>
-            <option value="addiction">התמכרויות</option>
-          </select>
+          <label data-i18n="category"></label>
+          <select id="pCategory"></select>
         </div>
         <div class="form-row">
-          <label>אזור</label>
-          <input type="text" id="pArea" placeholder="תל אביב">
+          <label data-i18n="area"></label>
+          <input type="text" id="pArea" data-ph="areaPh">
         </div>
       </div>
       <div class="row-2">
         <div class="form-row">
-          <label>מחיר לפגישה (₪)</label>
-          <input type="number" id="pPrice" placeholder="400">
+          <label data-i18n="price"></label>
+          <input type="number" id="pPrice" data-ph="pricePh">
         </div>
         <div class="form-row">
-          <label>שנות ניסיון</label>
-          <input type="number" id="pExp" placeholder="8">
+          <label data-i18n="exp"></label>
+          <input type="number" id="pExp" data-ph="expPh">
         </div>
       </div>
       <div class="form-row">
-        <label>על עצמי (ביו)</label>
-        <textarea id="pBio" placeholder="ספר/י על הגישה הטיפולית, תחומי ההתמחות והניסיון שלך…"></textarea>
+        <label data-i18n="bio"></label>
+        <textarea id="pBio" data-ph="bioPh"></textarea>
       </div>
       <div class="form-row">
-        <label>מספר רישיון</label>
-        <input type="text" id="pLicense" placeholder="מספר רישיון משרד הבריאות">
+        <label data-i18n="license"></label>
+        <input type="text" id="pLicense" data-ph="licensePh">
       </div>
       <div class="row-2">
         <div class="form-row">
-          <label>אתר אישי <span class="muted">(יוצג למטופלים)</span></label>
-          <input type="url" id="pWebsite" placeholder="https://your-site.co.il">
+          <label><span data-i18n="website"></span> <span class="muted" data-i18n="shownToClients"></span></label>
+          <input type="url" id="pWebsite" placeholder="https://...">
         </div>
         <div class="form-row">
-          <label>אינסטגרם <span class="muted">(יוצג למטופלים)</span></label>
+          <label><span data-i18n="instagram"></span> <span class="muted" data-i18n="shownToClients"></span></label>
           <input type="text" id="pInstagram" placeholder="@username">
         </div>
       </div>
       <div class="form-row check">
         <input type="checkbox" id="pOnline">
-        <label for="pOnline" style="margin:0;">זמין/ה גם לטיפול אונליין</label>
+        <label for="pOnline" style="margin:0;" data-i18n="onlineLabel"></label>
       </div>
       <div class="form-row">
-        <label>העלאת רישיון / תעודות (לאימות ידני)</label>
+        <label data-i18n="licenseUpload"></label>
         <input type="file" id="pLicenseFile" accept="image/*,application/pdf">
         <div class="muted" id="licenseStatus" style="margin-top:6px;"></div>
       </div>
-      <button class="btn-full" id="saveBtn" onclick="saveProfile()">שמור פרופיל</button>
+      <button class="btn-full" id="saveBtn" data-i18n="save" onclick="saveProfile()"></button>
     </div>
 
     <div class="card-box">
-      <h2>ההזמנות שלי</h2>
-      <p class="sub">פניות שהתקבלו מהלוח.</p>
-      <div id="bookingsList"><div class="muted">טוען…</div></div>
+      <h2 data-i18n="bookingsTitle"></h2>
+      <p class="sub" data-i18n="bookingsSub"></p>
+      <div id="bookingsList"></div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script src="js/data.js"></script>
 <script>
+// ---------- i18n ----------
+const STR = {
+  he: { dir:'rtl', navFind:'מצא מטפל', heroH:'הצטרף/י ל-<span>TeraBoard</span> כמטפל/ת', heroP:'בנה/י פרופיל מקצועי, קבל/י פניות ממטופלים חדשים, ונהל/י את היומן וההזמנות שלך — במקום אחד.',
+    offline:'⚠️ ה-backend עדיין לא מחובר (חסרים מפתחות Supabase ב-js/config.js). הטופס לתצוגה בלבד — הרשמה אמיתית תעבוד מיד לאחר חיבור המפתחות.',
+    tabSignup:'הרשמה', tabLogin:'כניסה', authSignup:'צור/י חשבון', authLogin:'כניסה',
+    email:'אימייל', emailPh:'you@example.com', password:'סיסמה', passPh:'לפחות 6 תווים',
+    profileTitle:'הפרופיל שלי', profileSub:'המידע הזה יוצג למטופלים בלוח.',
+    photo:'תמונת פרופיל', name:'שם מלא', namePh:'ד״ר ישראלה ישראלי', speciality:'התמחות / תיאור קצר', specialityPh:'פסיכולוגית קלינית, CBT',
+    category:'קטגוריה', area:'אזור', areaPh:'תל אביב', price:'מחיר לפגישה', pricePh:'400', exp:'שנות ניסיון', expPh:'8',
+    bio:'על עצמי (ביו)', bioPh:'ספר/י על הגישה הטיפולית, ההתמחות והניסיון שלך…', license:'מספר רישיון', licensePh:'מספר רישיון משרד הבריאות',
+    website:'אתר אישי', instagram:'אינסטגרם', shownToClients:'(יוצג למטופלים)', onlineLabel:'זמין/ה גם לטיפול אונליין',
+    licenseUpload:'העלאת רישיון / תעודות (לאימות ידני)', save:'שמור פרופיל',
+    bookingsTitle:'ההזמנות שלי', bookingsSub:'פניות שהתקבלו מהלוח.', bookingsEmpty:'אין הזמנות עדיין.', noProfileYet:'לאחר שמירת הפרופיל, פניות חדשות יופיעו כאן.', loading:'טוען…',
+    logout:e=>`התנתק (${e})`, st:{pending:'ממתין',confirmed:'מאושר',cancelled:'בוטל'}, client:'מטופל/ת',
+    backendOff:'ה-backend לא מחובר עדיין.', fillEmail:'נא למלא אימייל וסיסמה.', confirmMail:'נשלח אליך מייל לאימות. אשר/י אותו ואז התחבר/י.',
+    saved:'הפרופיל נשמר! יופיע בלוח לאחר אימות הרישיון.', saveFail:'שמירה נכשלה.', authFail:'אירעה שגיאה.',
+    uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ' },
+  en: { dir:'ltr', navFind:'Find a therapist', heroH:'Join <span>TeraBoard</span> as a therapist', heroP:'Build a professional profile, receive new client inquiries, and manage your calendar and bookings — all in one place.',
+    offline:'⚠️ Backend not connected yet (Supabase keys missing in js/config.js). This form is preview-only — real signup works as soon as keys are added.',
+    tabSignup:'Sign up', tabLogin:'Log in', authSignup:'Create account', authLogin:'Log in',
+    email:'Email', emailPh:'you@example.com', password:'Password', passPh:'At least 6 characters',
+    profileTitle:'My profile', profileSub:'This information is shown to clients on the board.',
+    photo:'Profile photo', name:'Full name', namePh:'Dr. Jane Doe', speciality:'Speciality / short description', specialityPh:'Clinical Psychologist, CBT',
+    category:'Category', area:'Area', areaPh:'New York', price:'Price per session', pricePh:'150', exp:'Years of experience', expPh:'8',
+    bio:'About me (bio)', bioPh:'Tell clients about your therapeutic approach, specialties and experience…', license:'License number', licensePh:'Professional license number',
+    website:'Website', instagram:'Instagram', shownToClients:'(shown to clients)', onlineLabel:'Also available for online sessions',
+    licenseUpload:'Upload license / credentials (for manual verification)', save:'Save profile',
+    bookingsTitle:'My bookings', bookingsSub:'Inquiries received from the board.', bookingsEmpty:'No bookings yet.', noProfileYet:'After you save your profile, new inquiries will appear here.', loading:'Loading…',
+    logout:e=>`Log out (${e})`, st:{pending:'Pending',confirmed:'Confirmed',cancelled:'Cancelled'}, client:'Client',
+    backendOff:'Backend not connected yet.', fillEmail:'Please enter email and password.', confirmMail:'A verification email was sent. Confirm it, then log in.',
+    saved:'Profile saved! It will appear on the board after license verification.', saveFail:'Save failed.', authFail:'An error occurred.',
+    uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ' },
+  pt: { dir:'ltr', navFind:'Encontrar terapeuta', heroH:'Junte-se ao <span>TeraBoard</span> como terapeuta', heroP:'Crie um perfil profissional, receba contatos de novos pacientes e gerencie sua agenda e seus agendamentos — tudo em um só lugar.',
+    offline:'⚠️ Backend ainda não conectado (faltam as chaves do Supabase em js/config.js). Este formulário é só de visualização — o cadastro real funciona assim que as chaves forem adicionadas.',
+    tabSignup:'Cadastrar', tabLogin:'Entrar', authSignup:'Criar conta', authLogin:'Entrar',
+    email:'E-mail', emailPh:'voce@exemplo.com', password:'Senha', passPh:'Mínimo de 6 caracteres',
+    profileTitle:'Meu perfil', profileSub:'Estas informações são exibidas aos pacientes no quadro.',
+    photo:'Foto de perfil', name:'Nome completo', namePh:'Dra. Mariana Silva', speciality:'Especialidade / descrição curta', specialityPh:'Psicóloga Clínica, TCC',
+    category:'Categoria', area:'Cidade', areaPh:'São Paulo', price:'Preço por sessão', pricePh:'250', exp:'Anos de experiência', expPh:'8',
+    bio:'Sobre mim (bio)', bioPh:'Conte aos pacientes sobre sua abordagem terapêutica, especialidades e experiência…', license:'Número de registro (CRP)', licensePh:'Número do registro profissional',
+    website:'Site', instagram:'Instagram', shownToClients:'(exibido aos pacientes)', onlineLabel:'Também disponível para sessões online',
+    licenseUpload:'Enviar registro / credenciais (para verificação manual)', save:'Salvar perfil',
+    bookingsTitle:'Meus agendamentos', bookingsSub:'Contatos recebidos pelo quadro.', bookingsEmpty:'Ainda sem agendamentos.', noProfileYet:'Após salvar seu perfil, novos contatos aparecerão aqui.', loading:'Carregando…',
+    logout:e=>`Sair (${e})`, st:{pending:'Pendente',confirmed:'Confirmado',cancelled:'Cancelado'}, client:'Paciente',
+    backendOff:'Backend ainda não conectado.', fillEmail:'Preencha e-mail e senha.', confirmMail:'Um e-mail de verificação foi enviado. Confirme e depois entre.',
+    saved:'Perfil salvo! Aparecerá no quadro após a verificação do registro.', saveFail:'Falha ao salvar.', authFail:'Ocorreu um erro.',
+    uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ' },
+};
+const CATS = [
+  { v:'psy',        he:'פסיכותרפיה',   en:'Psychotherapy',          pt:'Psicoterapia' },
+  { v:'couple',     he:'זוגיות',        en:'Couples',                pt:'Casais' },
+  { v:'kids',       he:'ילדים ונוער',   en:'Kids & Teens',           pt:'Crianças e Jovens' },
+  { v:'cbt',        he:'CBT',           en:'CBT',                    pt:'TCC' },
+  { v:'art',        he:'אמנות',         en:'Art Therapy',            pt:'Arteterapia' },
+  { v:'body',       he:'גוף-נפש',       en:'Body-Mind',              pt:'Corpo-Mente' },
+  { v:'addiction',  he:'התמכרויות',     en:'Addiction',              pt:'Dependências' },
+  { v:'trauma',     he:'טראומה ו-PTSD', en:'Trauma & PTSD',          pt:'Trauma e TEPT' },
+  { v:'family',     he:'משפחה',         en:'Family',                 pt:'Família' },
+  { v:'anxiety',    he:'חרדה ודיכאון',  en:'Anxiety & Depression',   pt:'Ansiedade e Depressão' },
+  { v:'mindfulness',he:'מיינדפולנס',    en:'Mindfulness',            pt:'Mindfulness' },
+  { v:'sexual',     he:'מיניות',        en:'Sex Therapy',            pt:'Sexologia' },
+  { v:'grief',      he:'אובדן ושכול',   en:'Grief & Loss',           pt:'Luto e Perda' },
+];
+
+const params = new URLSearchParams(location.search);
+let lang = params.get('lang') || sessionStorage.getItem('tb_lang') || 'he';
+if (!STR[lang]) lang = 'he';
+const T = STR[lang];
+const boardHref = 'therapist-board' + (lang==='he'?'':'-'+lang) + '.html';
+
+function applyI18n() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = T.dir;
+  document.title = 'TeraBoard — ' + T.navFind;
+  document.getElementById('logoLink').href = boardHref;
+  const nf = document.getElementById('navFind'); nf.href = boardHref; nf.textContent = T.navFind;
+  document.getElementById('heroH').innerHTML = T.heroH;
+  document.getElementById('heroP').textContent = T.heroP;
+  document.getElementById('offlineNote').textContent = T.offline;
+  document.getElementById('tabSignup').textContent = T.tabSignup;
+  document.getElementById('tabLogin').textContent = T.tabLogin;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = T[el.getAttribute('data-i18n')] || ''; });
+  document.querySelectorAll('[data-ph]').forEach(el => { el.placeholder = T[el.getAttribute('data-ph')] || ''; });
+  document.getElementById('pCategory').innerHTML = CATS.map(c => `<option value="${c.v}">${c[lang]}</option>`).join('');
+}
+
+// ---------- Supabase ----------
 const cfg = window.TERABOARD_CONFIG || {};
 const configured = Boolean(cfg.supabaseUrl && cfg.supabaseAnonKey);
-const sb = (configured && window.supabase)
-  ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey)
-  : null;
+const sb = (configured && window.supabase) ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
 
 let authMode = 'signup';
-let me = null;            // current auth user
-let myTherapist = null;   // current therapist row
+let me = null, myTherapist = null;
 
 function setTab(mode) {
   authMode = mode;
   document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
   document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
-  document.getElementById('authBtn').textContent = mode === 'signup' ? 'צור חשבון' : 'כניסה';
+  document.getElementById('authBtn').textContent = mode === 'signup' ? T.authSignup : T.authLogin;
   setMsg('authMsg', '');
 }
-
 function setMsg(id, html, kind) {
   document.getElementById(id).innerHTML = html ? `<div class="note ${kind||'ok'}">${html}</div>` : '';
 }
 
 async function doAuth() {
-  if (!sb) { setMsg('authMsg', 'ה-backend לא מחובר עדיין.', 'warn'); return; }
+  if (!sb) { setMsg('authMsg', T.backendOff, 'warn'); return; }
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
-  if (!email || !password) { setMsg('authMsg', 'נא למלא אימייל וסיסמה.', 'err'); return; }
+  if (!email || !password) { setMsg('authMsg', T.fillEmail, 'err'); return; }
   const btn = document.getElementById('authBtn'); btn.disabled = true;
   try {
     let res;
     if (authMode === 'signup') {
       res = await sb.auth.signUp({ email, password });
       if (res.error) throw res.error;
-      if (!res.data.session) {
-        setMsg('authMsg', 'נשלח אליך מייל לאימות הכתובת. אשר אותו ואז התחבר.', 'ok');
-        btn.disabled = false; return;
-      }
+      if (!res.data.session) { setMsg('authMsg', T.confirmMail, 'ok'); btn.disabled = false; return; }
     } else {
       res = await sb.auth.signInWithPassword({ email, password });
       if (res.error) throw res.error;
     }
     await loadSession();
-  } catch (e) {
-    setMsg('authMsg', e.message || 'אירעה שגיאה.', 'err');
-  } finally { btn.disabled = false; }
+  } catch (e) { setMsg('authMsg', e.message || T.authFail, 'err'); }
+  finally { btn.disabled = false; }
 }
-
 async function logout() { if (sb) await sb.auth.signOut(); me = null; myTherapist = null; render(); }
 
 async function loadSession() {
@@ -196,97 +275,78 @@ function render() {
   document.getElementById('authSection').classList.toggle('hidden', loggedIn);
   document.getElementById('dashSection').classList.toggle('hidden', !loggedIn);
   document.getElementById('offlineNote').classList.toggle('hidden', configured);
-  document.getElementById('navAuth').innerHTML = loggedIn
-    ? `<a href="#" onclick="logout();return false;">התנתק (${me.email})</a>`
-    : '';
+  document.getElementById('navAuth').innerHTML = loggedIn ? `<a href="#" onclick="logout();return false;">${T.logout(me.email)}</a>` : '';
   if (loggedIn) { fillProfile(); loadBookings(); }
 }
 
 function fillProfile() {
   const t = myTherapist || {};
-  pName.value = t.name || '';
-  pSpeciality.value = t.speciality || '';
-  pCategory.value = t.category || 'psy';
-  pArea.value = t.area || '';
-  pPrice.value = t.price || '';
-  pExp.value = t.exp || '';
-  pBio.value = t.bio || '';
-  pLicense.value = t.license_number || '';
-  pWebsite.value = t.website_url || '';
-  pInstagram.value = t.instagram || '';
-  pOnline.checked = Boolean(t.online);
+  pName.value = t.name || ''; pSpeciality.value = t.speciality || '';
+  pCategory.value = t.category || 'psy'; pArea.value = t.area || '';
+  pPrice.value = t.price || ''; pExp.value = t.exp || ''; pBio.value = t.bio || '';
+  pLicense.value = t.license_number || ''; pWebsite.value = t.website_url || '';
+  pInstagram.value = t.instagram || ''; pOnline.checked = Boolean(t.online);
+  if (t.photo_url) document.getElementById('photoPreview').style.backgroundImage = `url('${t.photo_url}')`;
 }
 
-async function uploadLicense() {
-  const file = document.getElementById('pLicenseFile').files[0];
+function previewPhoto() {
+  const f = document.getElementById('pPhotoFile').files[0];
+  if (f) document.getElementById('photoPreview').style.backgroundImage = `url('${URL.createObjectURL(f)}')`;
+}
+
+async function uploadTo(bucket, file, statusEl) {
   if (!file || !sb || !me) return null;
   const path = `${me.id}/${Date.now()}-${file.name}`;
-  document.getElementById('licenseStatus').textContent = 'מעלה קובץ…';
-  const { error } = await sb.storage.from('licenses').upload(path, file, { upsert: true });
-  if (error) { document.getElementById('licenseStatus').textContent = 'העלאה נכשלה: ' + error.message; return null; }
-  document.getElementById('licenseStatus').textContent = '✓ הקובץ הועלה לאימות.';
+  if (statusEl) statusEl.textContent = T.uploading;
+  const { error } = await sb.storage.from(bucket).upload(path, file, { upsert: true });
+  if (error) { if (statusEl) statusEl.textContent = T.uploadFail + error.message; return null; }
+  if (statusEl) statusEl.textContent = T.uploaded;
   return path;
 }
 
 async function saveProfile() {
-  if (!sb || !me) { setMsg('profileMsg', 'ה-backend לא מחובר עדיין.', 'warn'); return; }
+  if (!sb || !me) { setMsg('profileMsg', T.backendOff, 'warn'); return; }
   const btn = document.getElementById('saveBtn'); btn.disabled = true;
   try {
-    const licensePath = await uploadLicense();
+    await uploadTo('licenses', document.getElementById('pLicenseFile').files[0], document.getElementById('licenseStatus'));
+    const photoPath = await uploadTo('avatars', document.getElementById('pPhotoFile').files[0], null);
+    let photoUrl = myTherapist ? myTherapist.photo_url : null;
+    if (photoPath) { const { data } = sb.storage.from('avatars').getPublicUrl(photoPath); photoUrl = data.publicUrl; }
     const payload = {
-      user_id: me.id,
-      name: pName.value.trim(),
-      speciality: pSpeciality.value.trim(),
-      category: pCategory.value,
-      area: pArea.value.trim(),
-      price: parseInt(pPrice.value || '0', 10),
-      exp: parseInt(pExp.value || '0', 10),
-      bio: pBio.value.trim(),
-      license_number: pLicense.value.trim(),
-      website_url: pWebsite.value.trim() || null,
-      instagram: pInstagram.value.trim() || null,
-      online: pOnline.checked,
-      initial: (pName.value.trim()[0] || 'T'),
+      user_id: me.id, name: pName.value.trim(), speciality: pSpeciality.value.trim(),
+      category: pCategory.value, area: pArea.value.trim(),
+      price: parseInt(pPrice.value || '0', 10), exp: parseInt(pExp.value || '0', 10),
+      bio: pBio.value.trim(), license_number: pLicense.value.trim(),
+      website_url: pWebsite.value.trim() || null, instagram: pInstagram.value.trim() || null,
+      online: pOnline.checked, photo_url: photoUrl, initial: (pName.value.trim()[0] || 'T'),
     };
-    if (licensePath) payload.photo_url = myTherapist ? myTherapist.photo_url : null; // keep existing photo
     let res;
-    if (myTherapist) {
-      res = await sb.from('therapists').update(payload).eq('id', myTherapist.id).select().single();
-    } else {
-      res = await sb.from('therapists').insert(payload).select().single();
-    }
+    if (myTherapist) res = await sb.from('therapists').update(payload).eq('id', myTherapist.id).select().single();
+    else res = await sb.from('therapists').insert(payload).select().single();
     if (res.error) throw res.error;
     myTherapist = res.data;
-    setMsg('profileMsg', 'הפרופיל נשמר! הוא יופיע בלוח לאחר אימות הרישיון.', 'ok');
-  } catch (e) {
-    setMsg('profileMsg', e.message || 'שמירה נכשלה.', 'err');
-  } finally { btn.disabled = false; }
+    setMsg('profileMsg', T.saved, 'ok');
+  } catch (e) { setMsg('profileMsg', e.message || T.saveFail, 'err'); }
+  finally { btn.disabled = false; }
 }
 
 async function loadBookings() {
   const box = document.getElementById('bookingsList');
-  if (!sb || !myTherapist) { box.innerHTML = '<div class="muted">לאחר שמירת הפרופיל, פניות חדשות יופיעו כאן.</div>'; return; }
-  const { data, error } = await sb.from('bookings').select('*').eq('therapist_id', myTherapist.id).order('created_at', { ascending: false });
-  if (error || !data || !data.length) { box.innerHTML = '<div class="muted">אין הזמנות עדיין.</div>'; return; }
-  const labels = { pending: 'ממתין', confirmed: 'מאושר', cancelled: 'בוטל' };
+  if (!sb || !myTherapist) { box.innerHTML = `<div class="muted">${T.noProfileYet}</div>`; return; }
+  const { data } = await sb.from('bookings').select('*').eq('therapist_id', myTherapist.id).order('created_at', { ascending: false });
+  if (!data || !data.length) { box.innerHTML = `<div class="muted">${T.bookingsEmpty}</div>`; return; }
   box.innerHTML = data.map(b => `
     <div class="booking-item">
-      <div>
-        <div class="who">${b.full_name || 'מטופל/ת'} ${b.phone ? '· ' + b.phone : ''}</div>
-        <div class="muted">${b.type || ''} ${b.notes ? '· ' + b.notes : ''}</div>
-      </div>
-      <span class="status ${b.status}">${labels[b.status] || b.status}</span>
-    </div>
-  `).join('');
+      <div><div class="who">${b.full_name || T.client} ${b.phone ? '· ' + b.phone : ''}</div>
+      <div class="muted">${b.type || ''} ${b.notes ? '· ' + b.notes : ''}</div></div>
+      <span class="status ${b.status}">${T.st[b.status] || b.status}</span>
+    </div>`).join('');
 }
 
 // boot
-if (sb) {
-  sb.auth.onAuthStateChange(() => loadSession());
-  loadSession();
-} else {
-  render();
-}
+applyI18n();
+setTab('signup');
+if (sb) { sb.auth.onAuthStateChange(() => loadSession()); loadSession(); } else { render(); }
 </script>
 </body>
 </html>

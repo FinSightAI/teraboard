@@ -163,6 +163,26 @@ create policy "licenses_owner_read"
   );
 
 -- ============================================================
+-- Storage bucket for profile photos (public — shown to clients)
+-- ============================================================
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+drop policy if exists "avatars_owner_insert" on storage.objects;
+create policy "avatars_owner_insert"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'avatars'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+drop policy if exists "avatars_public_read" on storage.objects;
+create policy "avatars_public_read"
+  on storage.objects for select
+  using (bucket_id = 'avatars');
+
+-- ============================================================
 -- Seed data — the 12 sample therapists from the prototype
 -- (idempotent: only inserts if the table is empty)
 -- ============================================================

@@ -16,15 +16,14 @@
   </div>
   <nav>
     <a href="#">מצא מטפל</a>
-    <a href="#">איך זה עובד</a>
-    <a href="for-therapists.html">למטפלים</a>
-    <a href="#">בלוג</a>
+    <a href="how-it-works.html?lang=he">איך זה עובד</a>
+    <a href="for-therapists.html?lang=he">למטפלים</a>
     <div class="lang-switch">
       <a href="#" class="active">HE</a>
       <a href="therapist-board-en.html">EN</a>
       <a href="therapist-board-pt.html">PT</a>
     </div>
-    <button class="btn-primary" onclick="location.href='for-therapists.html'">הרשמה</button>
+    <button class="btn-primary" onclick="location.href='for-therapists.html?lang=he'">הרשמה</button>
   </nav>
 </header>
 
@@ -115,7 +114,13 @@ const categories = [
   { icon: '🌿', name: 'CBT', value: 'cbt' },
   { icon: '🎭', name: 'אמנות', value: 'art' },
   { icon: '🧘', name: 'גוף-נפש', value: 'body' },
-  { icon: '💊', name: 'התמכרויות', value: 'addiction' }
+  { icon: '💊', name: 'התמכרויות', value: 'addiction' },
+  { icon: '🌧️', name: 'טראומה ו-PTSD', value: 'trauma' },
+  { icon: '👨‍👩‍👧', name: 'משפחה', value: 'family' },
+  { icon: '🌀', name: 'חרדה ודיכאון', value: 'anxiety' },
+  { icon: '🪷', name: 'מיינדפולנס', value: 'mindfulness' },
+  { icon: '💞', name: 'מיניות', value: 'sexual' },
+  { icon: '🕊️', name: 'אובדן ושכול', value: 'grief' }
 ];
 
 let therapists = [
@@ -130,7 +135,13 @@ let therapists = [
   { name: 'דנה אלון', speciality: 'CBT לנוער', cat: 'cbt', area: 'חיפה', online: true, rating: 4.7, reviews: 41, price: 350, exp: 5, initial: 'ד' },
   { name: 'אורי פרידמן', speciality: 'טיפול זוגי IMAGO', cat: 'couple', area: 'תל אביב', online: false, rating: 5.0, reviews: 38, price: 550, exp: 11, initial: 'א', badge: 'חדש' },
   { name: 'נטע ברגר', speciality: 'אמנות וטראומה', cat: 'art', area: 'שרון', online: true, rating: 4.8, reviews: 72, price: 340, exp: 10, initial: 'נ' },
-  { name: 'ד״ר עומר נחום', speciality: 'פסיכואנליזה יונגיאנית', cat: 'psy', area: 'ירושלים', online: false, rating: 4.9, reviews: 108, price: 520, exp: 20, initial: 'ע', badge: 'מומלץ' }
+  { name: 'ד״ר עומר נחום', speciality: 'פסיכואנליזה יונגיאנית', cat: 'psy', area: 'ירושלים', online: false, rating: 4.9, reviews: 108, price: 520, exp: 20, initial: 'ע', badge: 'מומלץ' },
+  { name: 'ד״ר ליאת מזרחי', speciality: 'טראומה ו-EMDR', cat: 'trauma', area: 'תל אביב', online: true, rating: 4.9, reviews: 64, price: 470, exp: 16, initial: 'ל', photo: 'https://randomuser.me/api/portraits/women/90.jpg' },
+  { name: 'גיא שפירא', speciality: 'טיפול משפחתי', cat: 'family', area: 'שרון', online: false, rating: 4.8, reviews: 81, price: 420, exp: 12, initial: 'ג', photo: 'https://randomuser.me/api/portraits/men/15.jpg' },
+  { name: 'ד״ר מאיה גל', speciality: 'חרדה ודיכאון', cat: 'anxiety', area: 'ירושלים', online: true, rating: 4.9, reviews: 118, price: 450, exp: 14, initial: 'מ', badge: 'מומלץ', photo: 'https://randomuser.me/api/portraits/women/56.jpg' },
+  { name: 'נועם בן-דוד', speciality: 'מיינדפולנס וגוף-נפש', cat: 'mindfulness', area: 'אונליין', online: true, rating: 4.8, reviews: 73, price: 300, exp: 8, initial: 'נ', photo: 'https://randomuser.me/api/portraits/men/41.jpg' },
+  { name: 'ד״ר ענת לוין', speciality: 'מיניות וזוגיות', cat: 'sexual', area: 'תל אביב', online: true, rating: 4.9, reviews: 92, price: 520, exp: 15, initial: 'ע', badge: 'מומלץ', photo: 'https://randomuser.me/api/portraits/women/33.jpg' },
+  { name: 'דורון אבני', speciality: 'אובדן ושכול', cat: 'grief', area: 'חיפה', online: false, rating: 4.7, reviews: 48, price: 390, exp: 11, initial: 'ד', photo: 'https://randomuser.me/api/portraits/men/3.jpg' }
 ];
 
 let activeCategory = 'all';
@@ -175,7 +186,7 @@ function renderCards() {
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
-        <div class="avatar">${t.initial}</div>
+        ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
       </div>
       <div class="card-body">
         <h3>${t.name}</h3>

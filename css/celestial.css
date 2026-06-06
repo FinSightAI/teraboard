@@ -6,16 +6,16 @@
    ============================================================ */
 
 :root {
-  /* palette — amethyst · indigo · gold · lavender mist */
-  --mist:       #f4effb;
-  --mist-deep:  #e7dcf5;
+  /* palette — deep amethyst · indigo · gold · lavender mist */
+  --mist:       #efe7fa;
+  --mist-deep:  #ddcdf0;
   --card:       #fdfbff;
-  --violet:     #6d4fb0;   /* primary CTA */
-  --violet-d:   #553c92;   /* hover */
-  --amethyst:   #8a6fd1;
-  --indigo:     #3a2b63;   /* deep accents, secondary buttons */
-  --indigo-d:   #2c2050;
-  --lav-soft:   #c8b8ec;
+  --violet:     #5b3aa6;   /* primary CTA */
+  --violet-d:   #45287f;   /* hover */
+  --amethyst:   #7857c0;
+  --indigo:     #2f2056;   /* deep accents, secondary buttons */
+  --indigo-d:   #211541;
+  --lav-soft:   #bda7e6;
   --ink:        #2c2440;
   --ink-soft:   #74688f;
   --line:       #e7def5;
@@ -157,7 +157,7 @@ nav a:hover { color: var(--violet); }
 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-soft); border-color: var(--lav-soft); }
 .card-img {
   height: 168px; position: relative; display: flex; align-items: flex-end; padding: 18px;
-  background: linear-gradient(140deg, #b29fe6 0%, #7c5cbf 48%, #46347e 100%);
+  background: linear-gradient(140deg, #8f74cf 0%, #5e3ea8 48%, #2f1f57 100%);
 }
 /* faint lotus watermark on the card header */
 .card-img::after {
@@ -272,7 +272,7 @@ nav a:hover { color: var(--violet); }
 .profile-top::after { content: ""; position: absolute; top: -10px; inset-inline-end: -10px; width: 150px; height: 116px; background: var(--motif) center/contain no-repeat; opacity: 0.10; }
 .profile-avatar {
   width: 116px; height: 116px; border-radius: 50%; flex: 0 0 auto; z-index: 1;
-  background: linear-gradient(140deg, #b29fe6, #46347e);
+  background: linear-gradient(140deg, #8f74cf, #2f1f57);
   color: #fff; font-family: var(--font-display); font-size: 46px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 10px 26px rgba(70,52,126,0.38);

@@ -113,7 +113,7 @@ async function load() {
       id: data.id, name: data.name, speciality: data.speciality, cat: data.category,
       area: data.area, online: data.online, price: data.price, exp: data.exp, bio: data.bio,
       rating: Number(data.rating), reviews: data.reviews_count, initial: data.initial,
-      verified: data.verified, website: data.website_url || undefined, instagram: data.instagram || undefined,
+      verified: data.verified, website: data.website_url || undefined, instagram: data.instagram || undefined, photo: data.photo_url || undefined,
     };
   }
   render();
@@ -130,7 +130,7 @@ function render() {
   root.innerHTML = `
     <a class="back-link" href="therapist-board${lang==='he'?'':'-'+lang}.html">← ${T.back}</a>
     <div class="profile-top">
-      <div class="profile-avatar">${esc(t.initial || (t.name||'?')[0])}</div>
+      ${t.photo ? `<div class="profile-avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="profile-avatar">${esc(t.initial || (t.name||'?')[0])}</div>`}
       <div class="profile-id">
         <h1>${esc(t.name)}</h1>
         <div class="speciality">${esc(t.speciality)}</div>

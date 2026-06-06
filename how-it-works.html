@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeraBoard</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/celestial.css">
+<style>
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 8px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 28px; box-shadow: 0 12px 34px rgba(58,43,99,0.06); position: relative; }
+  .step .num { font-family: var(--font-display); font-size: 40px; color: var(--lav-soft); font-weight: 600; line-height: 1; }
+  .step .ic { font-size: 30px; margin: 8px 0 12px; }
+  .step h3 { font-family: var(--font-display); font-size: 22px; color: var(--ink); margin-bottom: 8px; font-weight: 600; }
+  .step p { color: var(--ink-soft); font-size: 14px; line-height: 1.65; }
+  .cta-band { background: linear-gradient(140deg, #5e3ea8, #2f1f57); color: #fff; border-radius: var(--r-card); padding: 38px; text-align: center; margin-top: 34px; position: relative; overflow: hidden; }
+  .cta-band h2 { font-family: var(--font-display); font-size: 30px; font-weight: 600; margin-bottom: 8px; }
+  .cta-band p { opacity: 0.9; margin-bottom: 20px; }
+  .cta-band .btn-primary { background: #fff; color: var(--violet-d); }
+  .cta-band .btn-primary:hover { background: #f3eefb; }
+  @media (max-width: 720px) { .steps { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" id="logoLink" href="therapist-board.html">
+    <div class="logo-mark">T</div>
+    TeraBoard
+  </a>
+  <nav><a id="navFind" href="therapist-board.html"></a></nav>
+</header>
+
+<div class="wrap" style="max-width:1040px;">
+  <div class="hero-h">
+    <h1 id="title"></h1>
+    <p id="sub"></p>
+  </div>
+
+  <div class="steps" id="steps"></div>
+
+  <div class="cta-band">
+    <h2 id="ctaTitle"></h2>
+    <p id="ctaText"></p>
+    <button class="btn-primary" id="ctaBtn"></button>
+  </div>
+</div>
+
+<script>
+const STR = {
+  he: { dir:'rtl', navFind:'מצא מטפל', title:'איך <span>TeraBoard</span> עובד', sub:'שלושה צעדים פשוטים בדרך למטפל/ת המתאים/ה לך.',
+    steps:[
+      { ic:'🔍', t:'מחפשים ומסננים', p:'חיפוש לפי תחום, עיר, מחיר וזמינות אונליין — מתוך מאות מטפלים מורשים ומאומתים.' },
+      { ic:'🪷', t:'משווים פרופילים', p:'דירוגים, ביקורות אמיתיות, מחיר לפגישה, אתר ואינסטגרם — כל מה שצריך כדי לבחור בביטחון.' },
+      { ic:'📅', t:'מתאמים בקלות', p:'בוחרים שעה פנויה ושולחים בקשה. המטפל/ת חוזר/ת אליכם עם אישור — ואתם בדרך.' },
+    ],
+    ctaTitle:'את/ה מטפל/ת?', ctaText:'בנה/י פרופיל חינם וקבל/י פניות ממטופלים חדשים.', ctaBtn:'הצטרפות כמטפל/ת', forT:'for-therapists.html?lang=he' },
+  en: { dir:'ltr', navFind:'Find a therapist', title:'How <span>TeraBoard</span> works', sub:'Three simple steps to the right therapist for you.',
+    steps:[
+      { ic:'🔍', t:'Search & filter', p:'Search by specialty, city, price and online availability — across hundreds of licensed, verified therapists.' },
+      { ic:'🪷', t:'Compare profiles', p:'Ratings, real reviews, price per session, website and Instagram — everything you need to choose with confidence.' },
+      { ic:'📅', t:'Book in seconds', p:'Pick an available time and send a request. The therapist confirms — and you are on your way.' },
+    ],
+    ctaTitle:'Are you a therapist?', ctaText:'Build a free profile and receive new client inquiries.', ctaBtn:'Join as a therapist', forT:'for-therapists.html?lang=en' },
+  pt: { dir:'ltr', navFind:'Encontrar terapeuta', title:'Como o <span>TeraBoard</span> funciona', sub:'Três passos simples até o terapeuta ideal para você.',
+    steps:[
+      { ic:'🔍', t:'Busque e filtre', p:'Busque por especialidade, cidade, preço e disponibilidade online — entre centenas de terapeutas licenciados e verificados.' },
+      { ic:'🪷', t:'Compare perfis', p:'Avaliações, comentários reais, preço por sessão, site e Instagram — tudo o que você precisa para escolher com confiança.' },
+      { ic:'📅', t:'Agende em segundos', p:'Escolha um horário disponível e envie a solicitação. O terapeuta confirma — e você está a caminho.' },
+    ],
+    ctaTitle:'Você é terapeuta?', ctaText:'Crie um perfil gratuito e receba contatos de novos pacientes.', ctaBtn:'Cadastre-se como terapeuta', forT:'for-therapists.html?lang=pt' },
+};
+const params = new URLSearchParams(location.search);
+let lang = params.get('lang') || 'he';
+if (!STR[lang]) lang = 'he';
+const T = STR[lang];
+const boardHref = 'therapist-board' + (lang==='he'?'':'-'+lang) + '.html';
+
+document.documentElement.lang = lang;
+document.documentElement.dir = T.dir;
+document.title = 'TeraBoard — ' + T.navFind;
+document.getElementById('logoLink').href = boardHref;
+const nf = document.getElementById('navFind'); nf.href = boardHref; nf.textContent = T.navFind;
+document.getElementById('title').innerHTML = T.title;
+document.getElementById('sub').textContent = T.sub;
+document.getElementById('steps').innerHTML = T.steps.map((s,i) => `
+  <div class="step"><div class="num">${i+1}</div><div class="ic">${s.ic}</div><h3>${s.t}</h3><p>${s.p}</p></div>
+`).join('');
+document.getElementById('ctaTitle').textContent = T.ctaTitle;
+document.getElementById('ctaText').textContent = T.ctaText;
+const cb = document.getElementById('ctaBtn'); cb.textContent = T.ctaBtn; cb.onclick = () => location.href = T.forT;
+</script>
+</body>
+</html>

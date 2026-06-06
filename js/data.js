@@ -28,6 +28,7 @@
       badge: r.badge || undefined,
       website: r.website_url || undefined,
       instagram: r.instagram || undefined,
+      photo: r.photo_url || undefined,
     };
   }
 
