@@ -31,11 +31,11 @@ charge nothing — seed supply (free "founding therapists"), pick a narrow city+
 single-player value (shareable profile), manufacture demand, monetize only proven value later. You can
 only reliably bill on what flows through the platform (on-platform payments) or on delivered leads.
 
-### ⚠️ Remaining manual step to go fully live
-The backend is **not connected yet** — it runs on sample data until credentials are added:
-1. Create a Supabase project (region EU/Frankfurt).
-2. Run `supabase/schema.sql` in the SQL Editor.
-3. Put the Project URL + anon key into `js/config.js` (and as Vercel env if desired), then redeploy.
+### ✅ Backend connected (live)
+Supabase is connected and live. Project URL `https://gyuxaeqruorbtrtmewkt.supabase.co`
+(region São Paulo), publishable key in `js/config.js` (client-public, RLS-protected).
+Schema + Brazilian seed (14 therapists w/ photos) applied. Boards, bookings, therapist
+signup, photo upload, and the leads counter all run on real data.
 
 Deploy command used: `vercel deploy --prod --yes --scope finsightai-4755s-projects`
 
