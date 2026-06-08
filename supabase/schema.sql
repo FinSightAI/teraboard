@@ -187,23 +187,21 @@ create policy "avatars_public_read"
 -- (idempotent: only inserts if the table is empty)
 -- ============================================================
 insert into public.therapists
-  (name, speciality, category, area, online, price, exp, initial, badge, verified, rating, reviews_count)
+  (name, speciality, category, area, online, price, exp, initial, badge, verified, rating, reviews_count, photo_url, website_url, instagram)
 select * from (values
-  ('ד״ר נועה לוי',     'פסיכולוגית קלינית',        'psy',       'תל אביב', true,  450, 12, 'נ', 'מומלץ', true, 4.9, 142),
-  ('יואב כהן',         'מטפל זוגי וקבוצתי',         'couple',    'ירושלים', true,  380,  8, 'י', null,    true, 4.8,  89),
-  ('ד״ר שירה אברהם',   'CBT והפרעות חרדה',          'cbt',       'תל אביב', false, 500, 15, 'ש', 'חדש',   true, 5.0,  56),
-  ('מיכל ברק',         'מטפלת באמנות',              'art',       'חיפה',    true,  320,  6, 'מ', null,    true, 4.7,  78),
-  ('אסף רוזן',         'פסיכותרפיה דינמית',         'psy',       'שרון',    false, 420, 18, 'א', 'מומלץ', true, 4.9, 203),
-  ('תמר ויסמן',        'מטפלת רגשית לילדים',        'kids',      'תל אביב', true,  360,  9, 'ת', null,    true, 4.8,  95),
-  ('ד״ר רונן שטרן',    'התמכרויות וסמים',           'addiction', 'ירושלים', true,  480, 14, 'ר', null,    true, 4.6,  67),
-  ('יעל גולדמן',       'יוגה תרפיה וגוף-נפש',       'body',      'אונליין', true,  280,  7, 'י', null,    true, 4.9, 124),
-  ('דנה אלון',         'CBT לנוער',                 'cbt',       'חיפה',    true,  350,  5, 'ד', null,    true, 4.7,  41),
-  ('אורי פרידמן',      'טיפול זוגי IMAGO',          'couple',    'תל אביב', false, 550, 11, 'א', 'חדש',   true, 5.0,  38),
-  ('נטע ברגר',         'אמנות וטראומה',             'art',       'שרון',    true,  340, 10, 'נ', null,    true, 4.8,  72),
-  ('ד״ר עומר נחום',    'פסיכואנליזה יונגיאנית',     'psy',       'ירושלים', false, 520, 20, 'ע', 'מומלץ', true, 4.9, 108)
-) as seed(name, speciality, category, area, online, price, exp, initial, badge, verified, rating, reviews_count)
+  ('Dra. Mariana Silva',     'Psicóloga Clínica',            'psy',        'São Paulo',       true,  280, 13, 'M', 'Recomendado', true, 4.9, 168, 'https://randomuser.me/api/portraits/women/68.jpg', 'https://marianasilva.com.br', 'mariana.psi'),
+  ('Rafael Oliveira',        'Terapeuta de Casais',          'couple',     'Rio de Janeiro',  true,  240,  9, 'R', null,          true, 4.8,  94, 'https://randomuser.me/api/portraits/men/32.jpg',   null, null),
+  ('Dra. Camila Santos',     'TCC e Ansiedade',              'cbt',        'São Paulo',       false, 300, 15, 'C', 'Novo',        true, 5.0,  61, 'https://randomuser.me/api/portraits/women/44.jpg', null, null),
+  ('Juliana Costa',          'Arteterapeuta',                'art',        'Belo Horizonte',  true,  200,  7, 'J', null,          true, 4.7,  73, 'https://randomuser.me/api/portraits/women/12.jpg', null, null),
+  ('Bruno Almeida',          'Psicoterapia Psicodinâmica',   'psy',        'Curitiba',        false, 260, 18, 'B', 'Recomendado', true, 4.9, 210, 'https://randomuser.me/api/portraits/men/52.jpg',   null, null),
+  ('Dra. Patrícia Ferreira', 'Terapia Infantil',             'kids',       'São Paulo',       true,  220, 10, 'P', null,          true, 4.8,  88, 'https://randomuser.me/api/portraits/women/29.jpg', null, null),
+  ('Lucas Rodrigues',        'Recuperação de Dependências',  'addiction',  'Rio de Janeiro',  true,  300, 14, 'L', null,          true, 4.6,  67, 'https://randomuser.me/api/portraits/men/76.jpg',   null, null),
+  ('Fernanda Lima',          'Mindfulness e Meditação',      'mindfulness','Online',          true,  180,  8, 'F', null,          true, 4.9, 131, 'https://randomuser.me/api/portraits/women/65.jpg', null, 'fer.mindful'),
+  ('Dra. Beatriz Carvalho',  'Trauma e EMDR',                'trauma',     'Porto Alegre',    true,  320, 16, 'B', 'Novo',        true, 5.0,  54, 'https://randomuser.me/api/portraits/women/90.jpg', null, null),
+  ('Thiago Pereira',         'Terapia Familiar Sistêmica',   'family',     'Brasília',        false, 270, 12, 'T', null,          true, 4.8,  79, 'https://randomuser.me/api/portraits/men/15.jpg',   null, null),
+  ('Dra. Aline Souza',       'Sexologia Clínica',            'sexual',     'São Paulo',       true,  340, 11, 'A', 'Recomendado', true, 4.9,  96, 'https://randomuser.me/api/portraits/women/33.jpg', null, 'dra.alinesouza'),
+  ('Gabriel Martins',        'Luto e Perda',                 'grief',      'Lisboa',          true,  230,  9, 'G', null,          true, 4.7,  42, 'https://randomuser.me/api/portraits/men/3.jpg',    null, null),
+  ('Dra. Renata Gomes',      'Ansiedade e Depressão',        'anxiety',    'Curitiba',        true,  250, 13, 'R', null,          true, 4.8, 115, 'https://randomuser.me/api/portraits/women/56.jpg', null, null),
+  ('Marcelo Ribeiro',        'Corpo-Mente e Yoga',           'body',       'Florianópolis',   true,  190,  7, 'M', null,          true, 4.9, 124, 'https://randomuser.me/api/portraits/men/41.jpg',   null, 'marcelo.corpo')
+) as seed(name, speciality, category, area, online, price, exp, initial, badge, verified, rating, reviews_count, photo_url, website_url, instagram)
 where not exists (select 1 from public.therapists);
-
--- Demo links on a couple of seed profiles (so clients can see the feature).
-update public.therapists set website_url = 'https://noa-levi.co.il',  instagram = 'noa.levi.psy'    where name = 'ד״ר נועה לוי';
-update public.therapists set website_url = 'https://yael-yoga.co.il',  instagram = 'yael.bodymind'   where name = 'יעל גולדמן';
