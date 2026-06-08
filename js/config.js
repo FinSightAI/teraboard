@@ -1,7 +1,7 @@
 // TeraBoard — runtime config.
-// Fill these in after creating the Supabase project (Settings → API).
-// Leave empty to run on the built-in sample data (offline mode).
+// Connected to Supabase. The publishable key is client-public by design and
+// protected by Row Level Security (see supabase/schema.sql).
 window.TERABOARD_CONFIG = {
-  supabaseUrl: "",      // e.g. "https://abcdefgh.supabase.co"
-  supabaseAnonKey: "",  // the "anon public" key
+  supabaseUrl: "https://gyuxaeqruorbtrtmewkt.supabase.co",
+  supabaseAnonKey: "sb_publishable_5Jq6u5jHQCCQ2fWSO0R24g_ec_lWpdv",
 };
