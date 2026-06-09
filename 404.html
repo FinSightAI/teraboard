@@ -84,7 +84,8 @@ const msgs = {
   pt: { dir:'ltr', lang:'pt', title:'Página não encontrada', sub:'Parece que esta página não existe. O link pode estar desatualizado ou algo se perdeu no caminho.', home:'Voltar ao início', therapist:'Para terapeutas', navHome:'Início', boardHref:'/pt' },
 };
 const p = new URLSearchParams(location.search);
-let lang = p.get('lang') || sessionStorage.getItem('tb_lang') || (navigator.language||'en').toLowerCase().startsWith('pt') ? 'pt' : (navigator.language||'en').toLowerCase().startsWith('he') || (navigator.language||'en').toLowerCase().startsWith('iw') ? 'he' : 'en';
+const _nl = (navigator.language||'en').toLowerCase();
+let lang = p.get('lang') || sessionStorage.getItem('tb_lang') || (_nl.startsWith('pt') ? 'pt' : (_nl.startsWith('he') || _nl.startsWith('iw') ? 'he' : 'en'));
 if (!msgs[lang]) lang = 'en';
 const m = msgs[lang];
 document.documentElement.lang = lang;
