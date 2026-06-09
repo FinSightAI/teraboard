@@ -10,6 +10,7 @@
 <meta property="og:description" content="מצא מטפל/ת מתאים/ה ב-TeraBoard">
 <meta property="og:image" content="">
 <meta property="og:url" content="">
+<link rel="canonical" id="canonicalLink" href="">
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/celestial.css">
@@ -34,8 +35,8 @@
     <div id="modalFormWrap">
     <h3 id="modalTitle"></h3>
     <p class="modal-sub" id="modalSub"></p>
-    <div class="form-row"><label id="lblName"></label><input type="text" id="bName"></div>
-    <div class="form-row"><label id="lblPhone"></label><input type="tel" id="bPhone"></div>
+    <div class="form-row"><label id="lblName"></label><input type="text" id="bName" oninput="document.getElementById('formError').style.display='none'"></div>
+    <div class="form-row"><label id="lblPhone"></label><input type="tel" id="bPhone" oninput="document.getElementById('formError').style.display='none'"></div>
     <div class="form-row">
       <label id="lblType"></label>
       <select id="bType"><option id="optIntro"></option><option id="optRegular"></option><option id="optRemote"></option></select>
@@ -47,6 +48,7 @@
         <div class="slot">14:00</div><div class="slot">16:30</div><div class="slot">18:00</div>
       </div>
     </div>
+    <p id="formError" style="color:#b94569;font-size:13px;margin:0 0 8px;display:none;"></p>
     <div class="modal-actions">
       <button class="close-btn" id="btnCancel" onclick="closeModal()"></button>
       <button class="confirm-btn" id="btnConfirm" onclick="confirmBooking()"></button>
@@ -74,7 +76,8 @@ const I18N = {
         cancel:'ביטול', confirm:'אשר תיאום', close:'סגירה',
         bookedTitle:n=>`הפגישה עם ${n} תואמה! ✓`, bookedMsg:'בקשתך נשלחה למטפל/ת. הם יחזרו אליך לאישור סופי בהקדם.',
         notFound:'המטפל/ת לא נמצא/ה.', bookWith:n=>`תיאום פגישה עם ${n}`, sub:'בחר את הפרטים שלך ושעה זמינה',
-        share:'שתף פרופיל', shareCopied:'✓ הקישור הועתק' },
+        share:'שתף פרופיל', shareCopied:'✓ הקישור הועתק',
+        errName:'נא להזין שם מלא', errPhone:'נא להזין מספר טלפון', errSlot:'נא לבחור שעה מועדפת' },
   en: { dir:'ltr', back:'Back to board', years:'yrs experience', online:'Online', verified:'Verified', per:'/ session',
         about:'About', reviews:'Reviews', noReviews:'No reviews yet.', book:'Book a session',
         name:'Full name', phone:'Phone', type:'Session type', pick:'Pick a time — tomorrow',
@@ -82,7 +85,8 @@ const I18N = {
         cancel:'Cancel', confirm:'Confirm booking', close:'Close',
         bookedTitle:n=>`Session with ${n} booked! ✓`, bookedMsg:'Your request has been sent to the therapist. They will be in touch to confirm shortly.',
         notFound:'Therapist not found.', bookWith:n=>`Book a session with ${n}`, sub:'Enter your details and pick an available time',
-        share:'Share profile', shareCopied:'✓ Link copied' },
+        share:'Share profile', shareCopied:'✓ Link copied',
+        errName:'Please enter your full name', errPhone:'Please enter your phone number', errSlot:'Please pick a time slot' },
   pt: { dir:'ltr', back:'Voltar ao quadro', years:'anos de exp.', online:'Online', verified:'Verificado', per:'/ sessão',
         about:'Sobre', reviews:'Avaliações', noReviews:'Ainda sem avaliações.', book:'Agendar sessão',
         name:'Nome completo', phone:'Telefone', type:'Tipo de sessão', pick:'Escolha um horário — amanhã',
@@ -90,7 +94,8 @@ const I18N = {
         cancel:'Cancelar', confirm:'Confirmar', close:'Fechar',
         bookedTitle:n=>`Sessão com ${n} agendada! ✓`, bookedMsg:'Sua solicitação foi enviada ao terapeuta. Eles entrarão em contato para confirmação em breve.',
         notFound:'Terapeuta não encontrado.', bookWith:n=>`Agendar sessão com ${n}`, sub:'Preencha seus dados e escolha um horário disponível',
-        share:'Compartilhar perfil', shareCopied:'✓ Link copiado' },
+        share:'Compartilhar perfil', shareCopied:'✓ Link copiado',
+        errName:'Informe seu nome completo', errPhone:'Informe seu telefone', errSlot:'Selecione um horário disponível' },
 };
 const CUR = { he:'₪', en:'$', pt:'R$' };
 
@@ -155,6 +160,21 @@ function render() {
   setOg('og:description', t.bio ? t.bio.slice(0, 160) : `${t.speciality} · TeraBoard`);
   setOg('og:image', t.photo || '');
   setOg('og:url', location.href);
+  // canonical
+  const canonEl = document.getElementById('canonicalLink');
+  if (canonEl) canonEl.href = location.origin + (t.id ? `/t/${t.id}` : location.pathname) + '?lang=' + lang;
+  // JSON-LD structured data (Person schema) for Google
+  const ld = { '@context':'https://schema.org', '@type':'Person', name: t.name, jobTitle: t.speciality };
+  if (t.bio) ld.description = t.bio.slice(0, 300);
+  if (t.photo) ld.image = t.photo;
+  ld.url = location.href;
+  const sameAs = [];
+  if (t.website) sameAs.push(t.website);
+  if (t.instagram) sameAs.push(t.instagram.startsWith('http') ? t.instagram : `https://instagram.com/${t.instagram.replace(/^@/,'')}`);
+  if (sameAs.length) ld.sameAs = sameAs;
+  let ldEl = document.getElementById('jsonLd');
+  if (!ldEl) { ldEl = document.createElement('script'); ldEl.type = 'application/ld+json'; ldEl.id = 'jsonLd'; document.head.appendChild(ldEl); }
+  ldEl.textContent = JSON.stringify(ld);
   root.innerHTML = `
     <a class="back-link" href="${boardHref}">← ${T.back}</a>
     <div class="profile-top">
@@ -169,7 +189,7 @@ function render() {
           ${t.online ? `<span class="pill">💻 ${T.online}</span>` : ''}
         </div>
         <div class="profile-meta">
-          <div class="rating"><span class="stars">★★★★★</span> <span class="rating-num">${esc(t.rating)}</span> <span class="reviews-count">(${esc(t.reviews)})</span></div>
+          <div class="rating"><span class="stars">${TeraData.starsHTML(t.rating)}</span> <span class="rating-num">${esc(t.rating)}</span> <span class="reviews-count">(${esc(t.reviews)})</span></div>
           <div class="profile-price">${cur}${esc(t.price)} <small>${T.per}</small></div>
         </div>
         ${TeraData.contactLinksHTML(t)}
@@ -222,6 +242,9 @@ function shareProfile() {
 function openModal() {
   document.getElementById('modalTitle').textContent = T.bookWith(therapist.name);
   document.getElementById('modalSub').textContent = T.sub;
+  document.getElementById('bName').value = '';
+  document.getElementById('bPhone').value = '';
+  document.getElementById('formError').style.display = 'none';
   document.getElementById('modalFormWrap').style.display = '';
   document.getElementById('modalSuccessWrap').style.display = 'none';
   document.getElementById('modal').classList.add('active');
@@ -236,14 +259,21 @@ function closeModal() {
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
 }
 async function confirmBooking() {
-  const btn = document.getElementById('btnConfirm'); btn.disabled = true;
+  const name = document.getElementById('bName').value.trim();
+  const phone = document.getElementById('bPhone').value.trim();
   const slotEl = document.querySelector('.slot.selected');
+  const errEl = document.getElementById('formError');
+  if (!name)   { errEl.textContent = T.errName; errEl.style.display = 'block'; return; }
+  if (!phone)  { errEl.textContent = T.errPhone; errEl.style.display = 'block'; return; }
+  if (!slotEl) { errEl.textContent = T.errSlot; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('btnConfirm'); btn.disabled = true;
   await TeraData.createBooking({
     therapist_id: therapist.id || null,
-    full_name: document.getElementById('bName').value || null,
-    phone: document.getElementById('bPhone').value || null,
+    full_name: name,
+    phone,
     type: document.getElementById('bType').value,
-    notes: slotEl ? (T.pick + ': ' + slotEl.textContent) : null,
+    notes: T.pick + ': ' + slotEl.textContent,
     status: 'pending'
   });
   btn.disabled = false;

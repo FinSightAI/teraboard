@@ -153,7 +153,7 @@ const STR = {
     logout:e=>`התנתק (${e})`, st:{pending:'ממתין',confirmed:'מאושר',cancelled:'בוטל'}, client:'מטופל/ת',
     backendOff:'ה-backend לא מחובר עדיין.', fillEmail:'נא למלא אימייל וסיסמה.', confirmMail:'נשלח אליך מייל לאימות. אשר/י אותו ואז התחבר/י.',
     saved:'הפרופיל נשמר! יופיע בלוח לאחר אימות הרישיון.', saveFail:'שמירה נכשלה.', authFail:'אירעה שגיאה.',
-    uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ',
+    uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ', tooBig:n=>`קובץ גדול מדי (מקסימום ${n} MB)`,
     profileLink:'הקישור שלך לפרופיל', copyLink:'העתק', copied:'✓ הועתק!', viewProfile:'פרופיל',
     resend:'שלח שוב', resendOk:'נשלח מייל נוסף. בדוק/י את תיבת הדואר.' },
   en: { dir:'ltr', navFind:'Find a therapist', heroH:'Join <span>TeraBoard</span> as a therapist', heroP:'Build a professional profile, receive new client inquiries, and manage your calendar and bookings — all in one place.',
@@ -170,7 +170,7 @@ const STR = {
     logout:e=>`Log out (${e})`, st:{pending:'Pending',confirmed:'Confirmed',cancelled:'Cancelled'}, client:'Client',
     backendOff:'Backend not connected yet.', fillEmail:'Please enter email and password.', confirmMail:'A verification email was sent. Confirm it, then log in.',
     saved:'Profile saved! It will appear on the board after license verification.', saveFail:'Save failed.', authFail:'An error occurred.',
-    uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ',
+    uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ', tooBig:n=>`file too large (max ${n} MB)`,
     profileLink:'Your profile link', copyLink:'Copy', copied:'✓ Copied!', viewProfile:'View profile',
     resend:'Resend email', resendOk:'Another email was sent. Check your inbox.' },
   pt: { dir:'ltr', navFind:'Encontrar terapeuta', heroH:'Junte-se ao <span>TeraBoard</span> como terapeuta', heroP:'Crie um perfil profissional, receba contatos de novos pacientes e gerencie sua agenda e seus agendamentos — tudo em um só lugar.',
@@ -187,7 +187,7 @@ const STR = {
     logout:e=>`Sair (${e})`, st:{pending:'Pendente',confirmed:'Confirmado',cancelled:'Cancelado'}, client:'Paciente',
     backendOff:'Backend ainda não conectado.', fillEmail:'Preencha e-mail e senha.', confirmMail:'Um e-mail de verificação foi enviado. Confirme e depois entre.',
     saved:'Perfil salvo! Aparecerá no quadro após a verificação do registro.', saveFail:'Falha ao salvar.', authFail:'Ocorreu um erro.',
-    uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ',
+    uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ', tooBig:n=>`arquivo muito grande (máx ${n} MB)`,
     profileLink:'Seu link de perfil', copyLink:'Copiar', copied:'✓ Copiado!', viewProfile:'Ver perfil',
     resend:'Reenviar e-mail', resendOk:'Outro e-mail foi enviado. Verifique sua caixa de entrada.' },
 };
@@ -348,7 +348,7 @@ async function uploadTo(bucket, file, statusEl) {
   if (!file || !sb || !me) return null;
   const MAX = bucket === 'avatars' ? 5 : 10; // MB
   if (file.size > MAX * 1024 * 1024) {
-    if (statusEl) statusEl.textContent = T.uploadFail + `arquivo muito grande (máx ${MAX} MB)`;
+    if (statusEl) statusEl.textContent = T.uploadFail + T.tooBig(MAX);
     return null;
   }
   const path = `${me.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;

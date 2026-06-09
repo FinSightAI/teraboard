@@ -77,11 +77,11 @@
     <p class="modal-sub" id="modalSub"></p>
     <div class="form-row">
       <label>Full name</label>
-      <input type="text" id="bName" placeholder="Your name">
+      <input type="text" id="bName" placeholder="Your name" oninput="document.getElementById('formError').style.display='none'">
     </div>
     <div class="form-row">
       <label>Phone</label>
-      <input type="tel" id="bPhone" placeholder="+1 555 000 0000">
+      <input type="tel" id="bPhone" placeholder="+1 555 000 0000" oninput="document.getElementById('formError').style.display='none'">
     </div>
     <div class="form-row">
       <label>Session type</label>
@@ -102,6 +102,7 @@
         <div class="slot">18:00</div>
       </div>
     </div>
+    <p id="formError" style="color:#b94569;font-size:13px;margin:0 0 8px;display:none;"></p>
     <div class="modal-actions">
       <button class="close-btn" onclick="closeModal()">Cancel</button>
       <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()">Confirm booking</button>
@@ -250,7 +251,7 @@ function renderCards() {
           ${t.online ? '<div>💻 Online</div>' : ''}
         </div>
         <div class="rating">
-          <div class="stars">★★★★★</div>
+          <div class="stars">${TeraData.starsHTML(t.rating)}</div>
           <div class="rating-num">${t.rating}</div>
           <div class="reviews-count">(${t.reviews} reviews)</div>
         </div>
@@ -270,6 +271,9 @@ function openModal(idx) {
   selectedTherapistId = t.id || null;
   document.getElementById('modalTitle').textContent = `Book a session with ${t.name}`;
   document.getElementById('modalSub').textContent = 'Enter your details and pick an available time';
+  document.getElementById('bName').value = '';
+  document.getElementById('bPhone').value = '';
+  document.getElementById('formError').style.display = 'none';
   document.getElementById('modal').classList.add('active');
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
   document.querySelectorAll('.slot').forEach(s => s.onclick = () => {
@@ -286,17 +290,22 @@ function closeModal() {
 function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
-  const btn = document.getElementById('confirmBtn'); btn.disabled = true;
-  const name = document.getElementById('bName').value;
-  const phone = document.getElementById('bPhone').value;
-  const type = document.getElementById('bType').value;
+  const name = document.getElementById('bName').value.trim();
+  const phone = document.getElementById('bPhone').value.trim();
   const slotEl = document.querySelector('.slot.selected');
+  const errEl = document.getElementById('formError');
+  if (!name)   { errEl.textContent = 'Please enter your full name'; errEl.style.display = 'block'; return; }
+  if (!phone)  { errEl.textContent = 'Please enter your phone number'; errEl.style.display = 'block'; return; }
+  if (!slotEl) { errEl.textContent = 'Please pick a time slot'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('confirmBtn'); btn.disabled = true;
+  const type = document.getElementById('bType').value;
   await TeraData.createBooking({
     therapist_id: selectedTherapistId,
-    full_name: name || null,
-    phone: phone || null,
+    full_name: name,
+    phone,
     type,
-    notes: slotEl ? ('Requested time: ' + slotEl.textContent) : null,
+    notes: 'Requested time: ' + slotEl.textContent,
     status: 'pending'
   });
   btn.disabled = false;
@@ -318,8 +327,17 @@ function activateOnlineOnly(on) {
 
 async function boot() {
   renderCategories();
-  document.getElementById('grid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;color:var(--ink-soft);padding:60px 20px;font-size:16px;">Loading therapists…</div>';
+  document.getElementById('grid').innerHTML = Array(6).fill(0).map(() => `
+    <div class="card card-skel">
+      <div class="card-img" style="background:var(--bg-mist);"></div>
+      <div class="card-body" style="padding:18px 20px;">
+        <div class="skel skel-avatar"></div>
+        <div class="skel skel-line w80"></div>
+        <div class="skel skel-line w60"></div>
+        <div class="skel skel-line w40" style="margin-top:16px;"></div>
+        <div class="skel skel-btn" style="margin-top:20px;"></div>
+      </div>
+    </div>`).join('');
   therapists = await TeraData.getTherapists(therapists);
 
   TeraFeatures.setFavChangeHandler(() => { renderCategories(); renderCards(); });

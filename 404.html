@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeraBoard — דף לא נמצא</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@300;400;600&family=Cormorant+Garamond:ital,wght@1,600&family=Mulish:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/celestial.css">
+<style>
+  .not-found-wrap {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+  }
+  .not-found-lotus { font-size: 72px; margin-bottom: 24px; animation: float 3s ease-in-out infinite; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-12px); }
+  }
+  .not-found-code {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 20vw, 140px);
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--violet), var(--amethyst));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .not-found-title {
+    font-size: clamp(18px, 4vw, 26px);
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .not-found-sub {
+    color: var(--ink-soft);
+    font-size: 15px;
+    max-width: 380px;
+    line-height: 1.65;
+    margin-bottom: 36px;
+  }
+  .not-found-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .not-found-actions .btn-outline { min-width: 160px; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" id="logoLink" href="/">
+    <div class="logo-mark">T</div>
+    TeraBoard
+  </a>
+  <nav>
+    <a href="/" id="navHome">דף הבית</a>
+    <div class="lang-switch">
+      <a href="/?lang=he" class="active">HE</a>
+      <a href="/?lang=en">EN</a>
+      <a href="/?lang=pt">PT</a>
+    </div>
+  </nav>
+</header>
+
+<div class="not-found-wrap">
+  <div class="not-found-lotus">🪷</div>
+  <div class="not-found-code">404</div>
+  <div class="not-found-title" id="title404">הדף לא נמצא</div>
+  <p class="not-found-sub" id="sub404">נראה שהדף שחיפשת לא קיים כאן. אולי הקישור ישן, או שמשהו הלך לאיבוד בדרך.</p>
+  <div class="not-found-actions">
+    <a href="/" class="btn-primary" id="btnHome">חזרה לדף הבית</a>
+    <a href="for-therapists.html" class="btn-outline" id="btnTherapist">למטפלים</a>
+  </div>
+</div>
+
+<script>
+const msgs = {
+  he: { dir:'rtl', lang:'he', title:'הדף לא נמצא', sub:'נראה שהדף שחיפשת לא קיים כאן. אולי הקישור ישן, או שמשהו הלך לאיבוד בדרך.', home:'חזרה לדף הבית', therapist:'למטפלים', navHome:'דף הבית', boardHref:'/' },
+  en: { dir:'ltr', lang:'en', title:'Page not found', sub:'Looks like this page doesn\'t exist. The link may be outdated, or something got lost along the way.', home:'Back to home', therapist:'For therapists', navHome:'Home', boardHref:'/en' },
+  pt: { dir:'ltr', lang:'pt', title:'Página não encontrada', sub:'Parece que esta página não existe. O link pode estar desatualizado ou algo se perdeu no caminho.', home:'Voltar ao início', therapist:'Para terapeutas', navHome:'Início', boardHref:'/pt' },
+};
+const p = new URLSearchParams(location.search);
+let lang = p.get('lang') || sessionStorage.getItem('tb_lang') || (navigator.language||'en').toLowerCase().startsWith('pt') ? 'pt' : (navigator.language||'en').toLowerCase().startsWith('he') || (navigator.language||'en').toLowerCase().startsWith('iw') ? 'he' : 'en';
+if (!msgs[lang]) lang = 'en';
+const m = msgs[lang];
+document.documentElement.lang = lang;
+document.documentElement.dir = m.dir;
+document.getElementById('title404').textContent = m.title;
+document.getElementById('sub404').textContent = m.sub;
+document.getElementById('btnHome').textContent = m.home;
+document.getElementById('btnTherapist').textContent = m.therapist;
+document.getElementById('navHome').textContent = m.navHome;
+document.getElementById('logoLink').href = m.boardHref;
+document.getElementById('btnHome').href = m.boardHref;
+document.getElementById('btnTherapist').href = 'for-therapists.html?lang=' + lang;
+</script>
+</body>
+</html>

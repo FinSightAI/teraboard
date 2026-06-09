@@ -47,6 +47,12 @@
     client,
     isLive: () => Boolean(client),
 
+    // Render filled/empty stars based on actual rating value.
+    starsHTML(rating) {
+      const n = Math.min(5, Math.max(0, Math.round(Number(rating) || 0)));
+      return '★'.repeat(n) + '<span style="opacity:.3">' + '★'.repeat(5 - n) + '</span>';
+    },
+
     // Language-neutral contact links (website + Instagram) for a therapist
     // card. Returns '' when the therapist has neither. Clients can click through.
     contactLinksHTML(t) {
