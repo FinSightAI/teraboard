@@ -120,6 +120,9 @@
       <button class="btn-full" id="saveBtn" data-i18n="save" onclick="saveProfile()"></button>
     </div>
 
+    <!-- Shareable profile link — shown only after profile is saved -->
+    <div id="profileLinkSection"></div>
+
     <div class="card-box">
       <h2 data-i18n="bookingsTitle"></h2>
       <p class="sub" data-i18n="bookingsSub"></p>
@@ -150,7 +153,9 @@ const STR = {
     logout:e=>`התנתק (${e})`, st:{pending:'ממתין',confirmed:'מאושר',cancelled:'בוטל'}, client:'מטופל/ת',
     backendOff:'ה-backend לא מחובר עדיין.', fillEmail:'נא למלא אימייל וסיסמה.', confirmMail:'נשלח אליך מייל לאימות. אשר/י אותו ואז התחבר/י.',
     saved:'הפרופיל נשמר! יופיע בלוח לאחר אימות הרישיון.', saveFail:'שמירה נכשלה.', authFail:'אירעה שגיאה.',
-    uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ' },
+    uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ',
+    profileLink:'הקישור שלך לפרופיל', copyLink:'העתק', copied:'✓ הועתק!',
+    resend:'שלח שוב', resendOk:'נשלח מייל נוסף. בדוק/י את תיבת הדואר.' },
   en: { dir:'ltr', navFind:'Find a therapist', heroH:'Join <span>TeraBoard</span> as a therapist', heroP:'Build a professional profile, receive new client inquiries, and manage your calendar and bookings — all in one place.',
     offline:'⚠️ Backend not connected yet (Supabase keys missing in js/config.js). This form is preview-only — real signup works as soon as keys are added.',
     tabSignup:'Sign up', tabLogin:'Log in', authSignup:'Create account', authLogin:'Log in',
@@ -165,7 +170,9 @@ const STR = {
     logout:e=>`Log out (${e})`, st:{pending:'Pending',confirmed:'Confirmed',cancelled:'Cancelled'}, client:'Client',
     backendOff:'Backend not connected yet.', fillEmail:'Please enter email and password.', confirmMail:'A verification email was sent. Confirm it, then log in.',
     saved:'Profile saved! It will appear on the board after license verification.', saveFail:'Save failed.', authFail:'An error occurred.',
-    uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ' },
+    uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ',
+    profileLink:'Your profile link', copyLink:'Copy', copied:'✓ Copied!',
+    resend:'Resend email', resendOk:'Another email was sent. Check your inbox.' },
   pt: { dir:'ltr', navFind:'Encontrar terapeuta', heroH:'Junte-se ao <span>TeraBoard</span> como terapeuta', heroP:'Crie um perfil profissional, receba contatos de novos pacientes e gerencie sua agenda e seus agendamentos — tudo em um só lugar.',
     offline:'⚠️ Backend ainda não conectado (faltam as chaves do Supabase em js/config.js). Este formulário é só de visualização — o cadastro real funciona assim que as chaves forem adicionadas.',
     tabSignup:'Cadastrar', tabLogin:'Entrar', authSignup:'Criar conta', authLogin:'Entrar',
@@ -180,7 +187,9 @@ const STR = {
     logout:e=>`Sair (${e})`, st:{pending:'Pendente',confirmed:'Confirmado',cancelled:'Cancelado'}, client:'Paciente',
     backendOff:'Backend ainda não conectado.', fillEmail:'Preencha e-mail e senha.', confirmMail:'Um e-mail de verificação foi enviado. Confirme e depois entre.',
     saved:'Perfil salvo! Aparecerá no quadro após a verificação do registro.', saveFail:'Falha ao salvar.', authFail:'Ocorreu um erro.',
-    uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ' },
+    uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ',
+    profileLink:'Seu link de perfil', copyLink:'Copiar', copied:'✓ Copiado!',
+    resend:'Reenviar e-mail', resendOk:'Outro e-mail foi enviado. Verifique sua caixa de entrada.' },
 };
 const CATS = [
   { v:'psy',        he:'פסיכותרפיה',   en:'Psychotherapy',          pt:'Psicoterapia' },
@@ -250,7 +259,10 @@ async function doAuth() {
     if (authMode === 'signup') {
       res = await sb.auth.signUp({ email, password });
       if (res.error) throw res.error;
-      if (!res.data.session) { setMsg('authMsg', T.confirmMail, 'ok'); btn.disabled = false; return; }
+      if (!res.data.session) {
+        setMsg('authMsg', T.confirmMail + ` <a href="#" onclick="resendEmail();return false;" style="margin-inline-start:8px;color:var(--violet-d);text-decoration:underline;">${T.resend}</a>`, 'ok');
+        btn.disabled = false; return;
+      }
     } else {
       res = await sb.auth.signInWithPassword({ email, password });
       if (res.error) throw res.error;
@@ -260,6 +272,39 @@ async function doAuth() {
   finally { btn.disabled = false; }
 }
 async function logout() { if (sb) await sb.auth.signOut(); me = null; myTherapist = null; render(); }
+
+async function resendEmail() {
+  if (!sb) return;
+  const email = document.getElementById('authEmail').value.trim();
+  if (!email) return;
+  await sb.auth.resend({ type: 'signup', email });
+  setMsg('authMsg', T.resendOk, 'ok');
+}
+
+function renderProfileLink() {
+  const el = document.getElementById('profileLinkSection');
+  if (!el) return;
+  if (!myTherapist || !myTherapist.id) { el.innerHTML = ''; return; }
+  const url = `${location.origin}/t/${myTherapist.id}`;
+  el.innerHTML = `
+    <div class="card-box" style="padding:20px 24px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:20px;">🔗</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px;">${T.profileLink}</div>
+          <code id="profileUrl" style="display:block;background:var(--bg2,#f3eefb);padding:6px 12px;border-radius:8px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--violet-d);">${url}</code>
+        </div>
+        <button class="btn-outline" id="copyLinkBtn" onclick="copyProfileLink('${url}')" style="white-space:nowrap;">${T.copyLink}</button>
+      </div>
+    </div>`;
+}
+
+function copyProfileLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyLinkBtn');
+    if (btn) { btn.textContent = T.copied; setTimeout(() => { btn.textContent = T.copyLink; }, 2000); }
+  }).catch(() => { prompt(T.profileLink, url); });
+}
 
 async function loadSession() {
   if (!sb) { render(); return; }
@@ -278,7 +323,7 @@ function render() {
   document.getElementById('dashSection').classList.toggle('hidden', !loggedIn);
   document.getElementById('offlineNote').classList.toggle('hidden', configured);
   document.getElementById('navAuth').innerHTML = loggedIn ? `<a href="#" onclick="logout();return false;">${T.logout(me.email)}</a>` : '';
-  if (loggedIn) { fillProfile(); loadBookings(); }
+  if (loggedIn) { fillProfile(); renderProfileLink(); loadBookings(); }
 }
 
 function fillProfile() {
@@ -328,6 +373,7 @@ async function saveProfile() {
     if (res.error) throw res.error;
     myTherapist = res.data;
     setMsg('profileMsg', T.saved, 'ok');
+    renderProfileLink();
   } catch (e) { setMsg('profileMsg', e.message || T.saveFail, 'err'); }
   finally { btn.disabled = false; }
 }
@@ -350,11 +396,12 @@ async function loadBookings() {
   const list = data || [];
   renderLeadStats(list);
   if (!list.length) { box.innerHTML = `<div class="muted">${T.bookingsEmpty}</div>`; return; }
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   box.innerHTML = list.map(b => `
     <div class="booking-item">
-      <div><div class="who">${b.full_name || T.client} ${b.phone ? '· ' + b.phone : ''}</div>
-      <div class="muted">${b.type || ''} ${b.notes ? '· ' + b.notes : ''}</div></div>
-      <span class="status ${b.status}">${T.st[b.status] || b.status}</span>
+      <div><div class="who">${esc(b.full_name) || T.client}${b.phone ? ' · ' + esc(b.phone) : ''}</div>
+      <div class="muted">${esc(b.type || '')}${b.notes ? ' · ' + esc(b.notes) : ''}</div></div>
+      <span class="status ${esc(b.status)}">${T.st[b.status] || esc(b.status)}</span>
     </div>`).join('');
 }
 

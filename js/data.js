@@ -56,9 +56,9 @@
       const ig = normInstagram(t.instagram);
       if (!w && !ig) return "";
       const base =
-        "display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#f0ede7;text-decoration:none;font-size:16px;transition:background .2s;";
+        "display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#ede8f5;text-decoration:none;font-size:16px;transition:background .2s;";
       const a = (href, label, icon) =>
-        `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}" onclick="event.stopPropagation()" style="${base}" onmouseover="this.style.background='#c9d8cd'" onmouseout="this.style.background='#f0ede7'">${icon}</a>`;
+        `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}" onclick="event.stopPropagation()" style="${base}" onmouseover="this.style.background='#d4c6ed'" onmouseout="this.style.background='#ede8f5'">${icon}</a>`;
       return (
         '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
         (w ? a(w, siteLabel, "🌐") : "") +

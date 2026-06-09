@@ -4,16 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeraBoard — Encontre seu terapeuta</title>
+<meta name="description" content="Plataforma que conecta você a terapeutas licenciados e verificados — psicólogos, terapeutas de casais, TCC e mais. Busque, compare e agende com facilidade.">
+<meta property="og:title" content="TeraBoard — Encontre seu terapeuta">
+<meta property="og:description" content="Conecte-se a terapeutas licenciados no Brasil. Busque, compare e agende sua sessão.">
+<meta property="og:type" content="website">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/celestial.css">
 </head>
 <body>
 
 <header>
-  <div class="logo">
+  <a class="logo" href="#">
     <div class="logo-mark">T</div>
     TeraBoard
-  </div>
+  </a>
   <nav>
     <a href="#">Encontrar terapeuta</a>
     <a href="how-it-works.html?lang=pt">Como funciona</a>
@@ -30,12 +34,20 @@
 <section class="hero">
   <h1>Encontre o <span>terapeuta ideal</span> para você</h1>
   <p>Uma plataforma que conecta você a milhares de profissionais licenciados em saúde mental, bem-estar emocional e cuidado corpo-mente — com avaliações reais e disponibilidade em tempo real.</p>
+  <div id="moodResultBanner"></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nome, área ou especialidade...">
     <select id="areaFilter">
       <option value="">Todas as cidades</option>
       <option>São Paulo</option>
       <option>Rio de Janeiro</option>
+      <option>Belo Horizonte</option>
+      <option>Curitiba</option>
+      <option>Porto Alegre</option>
+      <option>Brasília</option>
+      <option>Florianópolis</option>
+      <option>Salvador</option>
+      <option>Recife</option>
       <option>Lisboa</option>
       <option>Porto</option>
       <option>Online</option>
@@ -43,6 +55,8 @@
     <button class="search-btn" onclick="renderCards()">Buscar</button>
   </div>
 </section>
+
+<div id="statsBar"></div>
 
 <div class="categories" id="categories"></div>
 
@@ -59,24 +73,26 @@
       <option value="reviews">Mais avaliações</option>
     </select>
   </div>
+  <div id="onlineBanner"></div>
   <div class="grid" id="grid"></div>
 </section>
 
-<div class="modal-bg" id="modal">
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
+    <div id="modalFormWrap">
     <h3 id="modalTitle">Agendar sessão</h3>
     <p class="modal-sub" id="modalSub"></p>
     <div class="form-row">
       <label>Nome completo</label>
-      <input type="text" placeholder="Seu nome">
+      <input type="text" id="bName" placeholder="Seu nome">
     </div>
     <div class="form-row">
       <label>Telefone</label>
-      <input type="tel" placeholder="(11) 90000-0000">
+      <input type="tel" id="bPhone" placeholder="(11) 90000-0000">
     </div>
     <div class="form-row">
       <label>Tipo de sessão</label>
-      <select>
+      <select id="bType">
         <option>Conversa inicial (grátis)</option>
         <option>Sessão padrão</option>
         <option>Remota (Zoom)</option>
@@ -95,16 +111,54 @@
     </div>
     <div class="modal-actions">
       <button class="close-btn" onclick="closeModal()">Cancelar</button>
-      <button class="confirm-btn" onclick="confirmBooking()">Confirmar</button>
+      <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()">Confirmar</button>
+    </div>
+    </div>
+    <div id="modalSuccessWrap" style="display:none;text-align:center;padding:32px 20px;">
+      <div style="font-size:52px;margin-bottom:16px;">🪷</div>
+      <h3 style="font-family:var(--font-display);font-size:22px;color:var(--ink);margin-bottom:8px;" id="successTitle"></h3>
+      <p style="color:var(--ink-soft);font-size:14px;line-height:1.65;" id="successMsg"></p>
+      <button class="btn-full" onclick="closeModal()" style="margin-top:20px;">Fechar</button>
     </div>
   </div>
 </div>
 
-<!-- Supabase client + TeraBoard data layer -->
+<!-- Supabase client + TeraBoard data layer + features -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
+<script src="js/features.js"></script>
 <script>
+// ── Feature configs ──────────────────────────────────────
+const MOOD_L = {
+  skip: 'Pular',
+  s1title: 'O que está acontecendo com você?',
+  s1sub: 'Escolha o que mais se aproxima do que você está sentindo',
+  s2title: 'Como prefere as sessões?',
+  s3title: 'Quando quer começar?',
+  moods: [
+    { icon: '😰', label: 'Ansiedade / Estresse',    cat: 'anxiety'     },
+    { icon: '😢', label: 'Tristeza / Depressão',    cat: 'anxiety'     },
+    { icon: '💔', label: 'Relacionamento / Família', cat: 'couple'      },
+    { icon: '🌀', label: 'Me sinto perdido/a',       cat: 'psy'         },
+    { icon: '😤', label: 'Exaustão / Burnout',       cat: 'mindfulness' },
+    { icon: '🌱', label: 'Crescimento pessoal',      cat: 'psy'         },
+  ],
+  modes: [
+    { icon: '💻', label: 'Só online',   val: 'online'  },
+    { icon: '📍', label: 'Presencial',  val: 'local'   },
+    { icon: '🤷', label: 'Tanto faz',   val: 'any'     },
+  ],
+  timing: [
+    { icon: '⚡', label: 'Esta semana',    val: 'soon'     },
+    { icon: '📅', label: 'Este mês',       val: 'month'    },
+    { icon: '👀', label: 'Só explorando',  val: 'browsing' },
+  ],
+};
+const STATS_L = { online: 'online agora', rating: 'média', reviews: 'avaliações' };
+const CTA_L   = { label: 'Preciso conversar agora' };
+let _onlineOnly = false;
+
 const categories = [
   { icon: '🧠', name: 'Todos', value: 'all' },
   { icon: '💭', name: 'Psicoterapia', value: 'psy' },
@@ -119,7 +173,8 @@ const categories = [
   { icon: '🌀', name: 'Ansiedade e Depressão', value: 'anxiety' },
   { icon: '🪷', name: 'Mindfulness', value: 'mindfulness' },
   { icon: '💞', name: 'Sexologia', value: 'sexual' },
-  { icon: '🕊️', name: 'Luto e Perda', value: 'grief' }
+  { icon: '🕊️', name: 'Luto e Perda', value: 'grief' },
+  { icon: '❤️', name: 'Salvos', value: 'favs', dynamic: true },
 ];
 
 let therapists = [
@@ -145,9 +200,13 @@ let selectedTherapistId = null;
 let currentList = [];
 
 function renderCategories() {
-  document.getElementById('categories').innerHTML = categories.map(c =>
-    `<div class="chip ${c.value === activeCategory ? 'active' : ''}" onclick="setCategory('${c.value}')">${c.icon} ${c.name}</div>`
-  ).join('');
+  const favCount = TeraFeatures.getFavCount();
+  document.getElementById('categories').innerHTML = categories.map(c => {
+    const label = c.dynamic ? `${c.icon} ${c.name}${favCount ? ` (${favCount})` : ''}` : `${c.icon} ${c.name}`;
+    const hide = c.value === 'favs' && favCount === 0 && activeCategory !== 'favs';
+    if (hide) return '';
+    return `<div class="chip ${c.value === activeCategory ? 'active' : ''}" onclick="setCategory('${c.value}')">${label}</div>`;
+  }).join('');
 }
 
 function setCategory(v) { activeCategory = v; renderCategories(); renderCards(); }
@@ -158,7 +217,9 @@ function renderCards() {
   const sort = document.getElementById('sortBy').value;
 
   let list = therapists.filter(t => {
+    if (activeCategory === 'favs') return TeraFeatures.isFav(t.id || t.name);
     if (activeCategory !== 'all' && t.cat !== activeCategory) return false;
+    if (_onlineOnly && !t.online) return false;
     if (area && t.area !== area) return false;
     if (q && !(t.name.toLowerCase().includes(q) || t.speciality.toLowerCase().includes(q))) return false;
     return true;
@@ -180,6 +241,7 @@ function renderCards() {
   document.getElementById('grid').innerHTML = list.map((t, i) => `
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
+        ${TeraFeatures.favButtonHTML(t.id || t.name)}
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
         ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
       </div>
@@ -220,15 +282,20 @@ function openModal(idx) {
     s.classList.add('selected');
   });
 }
-function closeModal() { document.getElementById('modal').classList.remove('active'); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  document.getElementById('modalFormWrap').style.display = '';
+  document.getElementById('modalSuccessWrap').style.display = 'none';
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+}
 function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
-  const m = document.getElementById('modal');
-  const name = m.querySelector('input[type=text]').value;
-  const phone = m.querySelector('input[type=tel]').value;
-  const type = m.querySelector('select').value;
-  const slotEl = m.querySelector('.slot.selected');
+  const btn = document.getElementById('confirmBtn'); btn.disabled = true;
+  const name = document.getElementById('bName').value;
+  const phone = document.getElementById('bPhone').value;
+  const type = document.getElementById('bType').value;
+  const slotEl = document.querySelector('.slot.selected');
   await TeraData.createBooking({
     therapist_id: selectedTherapistId,
     full_name: name || null,
@@ -237,16 +304,54 @@ async function confirmBooking() {
     notes: slotEl ? ('Horário solicitado: ' + slotEl.textContent) : null,
     status: 'pending'
   });
-  alert(`Sua sessão com ${selectedTherapist} foi agendada! Você receberá a confirmação por email.`);
-  closeModal();
+  btn.disabled = false;
+  document.getElementById('modalFormWrap').style.display = 'none';
+  document.getElementById('successTitle').textContent = `Sessão com ${selectedTherapist} agendada! ✓`;
+  document.getElementById('successMsg').textContent = 'Sua solicitação foi enviada ao terapeuta. Eles entrarão em contato para confirmação em breve.';
+  document.getElementById('modalSuccessWrap').style.display = 'block';
+}
+
+function activateOnlineOnly(on) {
+  _onlineOnly = on;
+  const banner = document.getElementById('onlineBanner');
+  if (on) {
+    const count = therapists.filter(t => t.online).length;
+    banner.innerHTML = `<div class="online-banner">💚 <span>Mostrando <strong>${count}</strong> terapeutas disponíveis agora</span><button onclick="activateOnlineOnly(false)">✕</button></div>`;
+  } else {
+    banner.innerHTML = '';
+  }
+  renderCards();
 }
 
 async function boot() {
   renderCategories();
   document.getElementById('grid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;color:#6b6862;padding:60px 20px;font-size:16px;">Carregando terapeutas…</div>';
+    '<div style="grid-column:1/-1;text-align:center;color:var(--ink-soft);padding:60px 20px;font-size:16px;">Carregando terapeutas…</div>';
   therapists = await TeraData.getTherapists(therapists);
-  renderCards();
+
+  // favorites change → re-render categories chip
+  TeraFeatures.setFavChangeHandler(() => { renderCategories(); renderCards(); });
+
+  // mood match overlay on first visit
+  TeraFeatures.showMoodMatch(MOOD_L, (result) => {
+    if (result.cat) {
+      activeCategory = result.cat;
+      const banner = document.getElementById('moodResultBanner');
+      if (banner) {
+        const labels = { anxiety:'ansiedade e depressão', couple:'terapia de casais', psy:'psicoterapia', mindfulness:'mindfulness', cbt:'TCC', grief:'luto e perda', trauma:'trauma', addiction:'dependências', kids:'terapia infantil', family:'família', body:'corpo-mente', sexual:'sexologia' };
+        banner.innerHTML = `<div class="mood-result-banner">✨ Encontramos terapeutas em <strong>${labels[result.cat] || result.cat}</strong> para você</div>`;
+      }
+    }
+    if (result.mode === 'online') _onlineOnly = true;
+    renderCategories();
+    renderCards();
+    TeraFeatures.renderStats('statsBar', therapists, STATS_L);
+    TeraFeatures.initFloatingCTA(CTA_L, () => {
+      _onlineOnly = false;
+      activateOnlineOnly(true);
+      document.querySelector('.listings')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
 }
 boot();
 </script>

@@ -108,10 +108,15 @@ create policy "reviews_auth_insert"
 
 -- bookings: a client may create a booking (anon allowed for the prototype
 -- modal); a client sees their own; a therapist sees bookings for their profile.
+-- Basic abuse guard: phone and full_name must not be empty, and therapist must exist.
 drop policy if exists "bookings_anyone_insert" on public.bookings;
 create policy "bookings_anyone_insert"
   on public.bookings for insert
-  with check (true);
+  with check (
+    full_name is not null and length(trim(full_name)) > 0
+    and therapist_id is not null
+    and exists (select 1 from public.therapists where id = bookings.therapist_id)
+  );
 
 drop policy if exists "bookings_client_read" on public.bookings;
 create policy "bookings_client_read"

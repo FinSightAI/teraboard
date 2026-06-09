@@ -321,4 +321,218 @@ nav a:hover { color: var(--violet); }
   .profile-top { flex-direction: column; align-items: center; text-align: center; }
   .profile-id h1 { font-size: 32px; }
   .pill-row, .profile-meta { justify-content: center; }
+  .mood-grid { grid-template-columns: repeat(2, 1fr); }
+  .floating-cta .cta-text { display: none; }
+  .floating-cta { padding: 14px; border-radius: 50%; width: 54px; height: 54px; justify-content: center; gap: 0; }
 }
+
+/* ============================================================
+   Features: stats bar · favorites · mood match · floating CTA
+   ============================================================ */
+
+/* ── stats bar ─────────────────────────────────────────── */
+.stats-bar {
+  text-align: center;
+  padding: 0 20px 24px;
+}
+.stats-bar-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 9px 24px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  box-shadow: 0 4px 16px rgba(58,43,99,.06);
+}
+.stats-bar-inner strong { color: var(--ink); font-weight: 700; }
+.bar-sep { width: 1px; height: 13px; background: var(--line); flex-shrink: 0; }
+
+/* ── favorites heart ───────────────────────────────────── */
+.card-img { position: relative; }
+.fav-btn {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  background: rgba(253,251,255,.88);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 15px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  transition: transform .15s, color .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  z-index: 2;
+  line-height: 1;
+}
+.fav-btn:hover { transform: scale(1.18); color: #c0397a; }
+.fav-btn.active { color: #c0397a; }
+
+/* ── mood match overlay ────────────────────────────────── */
+#moodOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44,32,72,.75);
+  backdrop-filter: blur(10px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .3s;
+}
+#moodOverlay.active { opacity: 1; }
+.mood-card {
+  background: var(--card);
+  border-radius: 28px;
+  padding: 38px 36px 30px;
+  max-width: 500px;
+  width: calc(100vw - 32px);
+  position: relative;
+  text-align: center;
+  box-shadow: 0 28px 90px rgba(44,32,72,.4);
+}
+.mood-skip {
+  position: absolute;
+  top: 16px;
+  inset-inline-end: 20px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: .7;
+}
+.mood-skip:hover { opacity: 1; }
+.mood-logo { font-size: 40px; margin-bottom: 14px; }
+.mood-title {
+  font-family: var(--font-display);
+  font-size: 23px;
+  color: var(--ink);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.mood-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 20px; line-height: 1.5; }
+.mstep { display: none; }
+.mstep-active { display: block; animation: mfade .22s ease; }
+@keyframes mfade { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+.mood-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 16px 8px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  cursor: pointer;
+  font-size: 26px;
+  transition: border-color .14s, background .14s, transform .1s, box-shadow .14s;
+}
+.mood-opt span { font-size: 11.5px; color: var(--ink-soft); line-height: 1.35; font-family: var(--font-body); }
+.mood-opt:hover {
+  border-color: var(--amethyst);
+  background: #f3eefb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(120,87,192,.15);
+}
+.mood-opt:active { transform: scale(.96); }
+.mood-result-banner {
+  background: linear-gradient(120deg, #5b3aa6 0%, #3a2b63 100%);
+  color: #fff;
+  border-radius: var(--r-pill);
+  padding: 10px 20px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  animation: mfade .3s ease;
+}
+.mood-dots { display: flex; justify-content: center; gap: 7px; margin-top: 22px; }
+.mdot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background .2s, width .2s, border-radius .2s;
+}
+.mdot-active { background: var(--violet); width: 20px; border-radius: var(--r-pill); }
+
+/* ── floating CTA ──────────────────────────────────────── */
+.floating-cta {
+  position: fixed;
+  bottom: 28px;
+  inset-inline-end: 24px;
+  z-index: 100;
+  background: linear-gradient(135deg, #6048b8, #2f2056);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 14px 22px 14px 16px;
+  font-size: 14.5px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 8px 32px rgba(96,72,184,.45);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), opacity .22s, box-shadow .2s;
+}
+.floating-cta:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 44px rgba(96,72,184,.55); }
+.floating-cta.cta-hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
+.pulse-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #b4f7a0;
+  position: relative;
+  flex-shrink: 0;
+}
+.pulse-dot::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: rgba(180,247,160,.35);
+  animation: pulse 1.6s ease-out infinite;
+}
+@keyframes pulse { 0%{ transform:scale(1); opacity:.8; } 100%{ transform:scale(2.4); opacity:0; } }
+
+/* ── online-only filter banner ─────────────────────────── */
+.online-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(120deg, #edf8ea, #f0f9eb);
+  border: 1px solid #b6e8a0;
+  border-radius: var(--r-pill);
+  padding: 9px 18px;
+  font-size: 13.5px;
+  color: #2a6020;
+  margin: 0 0 18px;
+  animation: mfade .25s ease;
+}
+.online-banner button {
+  margin-inline-start: auto;
+  background: none;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  opacity: .6;
+}
+.online-banner button:hover { opacity: 1; }

@@ -6,6 +6,10 @@
 <title>TeraBoard</title>
 <meta property="og:type" content="profile">
 <meta property="og:site_name" content="TeraBoard">
+<meta property="og:title" content="TeraBoard">
+<meta property="og:description" content="מצא מטפל/ת מתאים/ה ב-TeraBoard">
+<meta property="og:image" content="">
+<meta property="og:url" content="">
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/celestial.css">
@@ -25,8 +29,9 @@
 </div>
 
 <!-- Booking modal (same structure as the boards) -->
-<div class="modal-bg" id="modal">
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
+    <div id="modalFormWrap">
     <h3 id="modalTitle"></h3>
     <p class="modal-sub" id="modalSub"></p>
     <div class="form-row"><label id="lblName"></label><input type="text" id="bName"></div>
@@ -46,6 +51,13 @@
       <button class="close-btn" id="btnCancel" onclick="closeModal()"></button>
       <button class="confirm-btn" id="btnConfirm" onclick="confirmBooking()"></button>
     </div>
+    </div>
+    <div id="modalSuccessWrap" style="display:none;text-align:center;padding:32px 20px;">
+      <div style="font-size:52px;margin-bottom:16px;">🪷</div>
+      <h3 style="font-family:var(--font-display);font-size:22px;color:var(--ink);margin-bottom:8px;" id="successTitle"></h3>
+      <p style="color:var(--ink-soft);font-size:14px;line-height:1.65;" id="successMsg"></p>
+      <button class="btn-full" onclick="closeModal()" style="margin-top:20px;" id="btnClose"></button>
+    </div>
   </div>
 </div>
 
@@ -59,20 +71,26 @@ const I18N = {
         about:'על המטפל/ת', reviews:'ביקורות', noReviews:'אין ביקורות עדיין.', book:'תיאום פגישה',
         name:'שם מלא', phone:'טלפון', type:'סוג פגישה', pick:'בחר שעה — מחר',
         intro:'פגישת היכרות (חינם)', regular:'פגישה רגילה', remote:'פגישה מרחוק (זום)',
-        cancel:'ביטול', confirm:'אשר תיאום', booked:n=>`הפגישה עם ${n} תואמה בהצלחה! נשלח אליך אישור במייל.`,
-        notFound:'המטפל/ת לא נמצא/ה.', bookWith:n=>`תיאום פגישה עם ${n}`, sub:'בחר את הפרטים שלך ושעה זמינה' },
+        cancel:'ביטול', confirm:'אשר תיאום', close:'סגירה',
+        bookedTitle:n=>`הפגישה עם ${n} תואמה! ✓`, bookedMsg:'בקשתך נשלחה למטפל/ת. הם יחזרו אליך לאישור סופי בהקדם.',
+        notFound:'המטפל/ת לא נמצא/ה.', bookWith:n=>`תיאום פגישה עם ${n}`, sub:'בחר את הפרטים שלך ושעה זמינה',
+        share:'שתף פרופיל', shareCopied:'✓ הקישור הועתק' },
   en: { dir:'ltr', back:'Back to board', years:'yrs experience', online:'Online', verified:'Verified', per:'/ session',
         about:'About', reviews:'Reviews', noReviews:'No reviews yet.', book:'Book a session',
         name:'Full name', phone:'Phone', type:'Session type', pick:'Pick a time — tomorrow',
         intro:'Intro call (free)', regular:'Regular session', remote:'Remote (Zoom)',
-        cancel:'Cancel', confirm:'Confirm booking', booked:n=>`Your session with ${n} is booked! A confirmation will be sent to your email.`,
-        notFound:'Therapist not found.', bookWith:n=>`Book a session with ${n}`, sub:'Enter your details and pick an available time' },
+        cancel:'Cancel', confirm:'Confirm booking', close:'Close',
+        bookedTitle:n=>`Session with ${n} booked! ✓`, bookedMsg:'Your request has been sent to the therapist. They will be in touch to confirm shortly.',
+        notFound:'Therapist not found.', bookWith:n=>`Book a session with ${n}`, sub:'Enter your details and pick an available time',
+        share:'Share profile', shareCopied:'✓ Link copied' },
   pt: { dir:'ltr', back:'Voltar ao quadro', years:'anos de exp.', online:'Online', verified:'Verificado', per:'/ sessão',
         about:'Sobre', reviews:'Avaliações', noReviews:'Ainda sem avaliações.', book:'Agendar sessão',
         name:'Nome completo', phone:'Telefone', type:'Tipo de sessão', pick:'Escolha um horário — amanhã',
         intro:'Conversa inicial (grátis)', regular:'Sessão padrão', remote:'Remota (Zoom)',
-        cancel:'Cancelar', confirm:'Confirmar', booked:n=>`Sua sessão com ${n} foi agendada! Você receberá a confirmação por email.`,
-        notFound:'Terapeuta não encontrado.', bookWith:n=>`Agendar sessão com ${n}`, sub:'Preencha seus dados e escolha um horário disponível' },
+        cancel:'Cancelar', confirm:'Confirmar', close:'Fechar',
+        bookedTitle:n=>`Sessão com ${n} agendada! ✓`, bookedMsg:'Sua solicitação foi enviada ao terapeuta. Eles entrarão em contato para confirmação em breve.',
+        notFound:'Terapeuta não encontrado.', bookWith:n=>`Agendar sessão com ${n}`, sub:'Preencha seus dados e escolha um horário disponível',
+        share:'Compartilhar perfil', shareCopied:'✓ Link copiado' },
 };
 const CUR = { he:'₪', en:'$', pt:'R$' };
 
@@ -101,6 +119,7 @@ function setText() {
   document.getElementById('optRemote').textContent = T.remote;
   document.getElementById('btnCancel').textContent = T.cancel;
   document.getElementById('btnConfirm').textContent = T.confirm;
+  document.getElementById('btnClose').textContent = T.close;
 }
 
 async function load() {
@@ -130,6 +149,12 @@ function render() {
   if (!therapist) { root.innerHTML = `<div class="muted" style="padding:60px 0;text-align:center;">${T.notFound}</div>`; return; }
   const t = therapist;
   document.title = `${t.name} — TeraBoard`;
+  // dynamic OG tags for WhatsApp / Telegram / Instagram link previews
+  const setOg = (p, v) => { const el = document.querySelector(`meta[property="${p}"]`); if (el && v) el.setAttribute('content', v); };
+  setOg('og:title', `${t.name} — TeraBoard`);
+  setOg('og:description', t.bio ? t.bio.slice(0, 160) : `${t.speciality} · TeraBoard`);
+  setOg('og:image', t.photo || '');
+  setOg('og:url', location.href);
   root.innerHTML = `
     <a class="back-link" href="${boardHref}">← ${T.back}</a>
     <div class="profile-top">
@@ -154,7 +179,10 @@ function render() {
     <div class="profile-section">
       <h2>${T.about}</h2>
       <div class="bio">${t.bio ? esc(t.bio) : '—'}</div>
-      <div class="book-cta"><button class="btn-full" onclick="openModal()">${T.book}</button></div>
+      <div class="book-cta" style="display:flex;gap:10px;">
+        <button class="btn-full" onclick="openModal()" style="flex:1;">${T.book}</button>
+        <button class="btn-outline" id="shareBtn" onclick="shareProfile()" style="white-space:nowrap;padding:0 18px;">${T.share}</button>
+      </div>
     </div>
 
     <div class="profile-section">
@@ -176,17 +204,39 @@ async function loadReviews() {
     </div>`).join('');
 }
 
+// ---- share ----
+function shareProfile() {
+  const url = location.href;
+  const title = `${therapist.name} — TeraBoard`;
+  if (navigator.share) {
+    navigator.share({ title, url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.getElementById('shareBtn');
+      if (btn) { btn.textContent = T.shareCopied; setTimeout(() => { btn.textContent = T.share; }, 2200); }
+    });
+  }
+}
+
 // ---- booking ----
 function openModal() {
   document.getElementById('modalTitle').textContent = T.bookWith(therapist.name);
   document.getElementById('modalSub').textContent = T.sub;
+  document.getElementById('modalFormWrap').style.display = '';
+  document.getElementById('modalSuccessWrap').style.display = 'none';
   document.getElementById('modal').classList.add('active');
   document.querySelectorAll('.slot').forEach(s => { s.classList.remove('selected'); s.onclick = () => {
     document.querySelectorAll('.slot').forEach(x => x.classList.remove('selected')); s.classList.add('selected');
   };});
 }
-function closeModal() { document.getElementById('modal').classList.remove('active'); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  document.getElementById('modalFormWrap').style.display = '';
+  document.getElementById('modalSuccessWrap').style.display = 'none';
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+}
 async function confirmBooking() {
+  const btn = document.getElementById('btnConfirm'); btn.disabled = true;
   const slotEl = document.querySelector('.slot.selected');
   await TeraData.createBooking({
     therapist_id: therapist.id || null,
@@ -196,8 +246,11 @@ async function confirmBooking() {
     notes: slotEl ? (T.pick + ': ' + slotEl.textContent) : null,
     status: 'pending'
   });
-  alert(T.booked(therapist.name));
-  closeModal();
+  btn.disabled = false;
+  document.getElementById('modalFormWrap').style.display = 'none';
+  document.getElementById('successTitle').textContent = T.bookedTitle(therapist.name);
+  document.getElementById('successMsg').textContent = T.bookedMsg;
+  document.getElementById('modalSuccessWrap').style.display = 'block';
 }
 
 load();

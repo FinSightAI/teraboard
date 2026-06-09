@@ -4,16 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeraBoard — לוח המטפלים</title>
+<meta name="description" content="פלטפורמה שמחברת אותך למטפלים מורשים ומאומתים — פסיכולוגים, מטפלים זוגיים, CBT ועוד. חפש, השווה ותאם פגישה בקלות.">
+<meta property="og:title" content="TeraBoard — מצא מטפל">
+<meta property="og:description" content="פלטפורמה שמחברת אותך למטפלים מורשים — חפש, השווה ותאם פגישה.">
+<meta property="og:type" content="website">
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/celestial.css">
 </head>
 <body>
 
 <header>
-  <div class="logo">
+  <a class="logo" href="#">
     <div class="logo-mark">T</div>
     TeraBoard
-  </div>
+  </a>
   <nav>
     <a href="#">מצא מטפל</a>
     <a href="how-it-works.html?lang=he">איך זה עובד</a>
@@ -30,6 +34,7 @@
 <section class="hero">
   <h1>מצא את <span>המטפל המתאים</span> לך</h1>
   <p>פלטפורמה אחת שמחברת אותך לאלפי מטפלים מקצועיים בתחום הנפש, הרגש והגוף — מבוססת ביקורות אמיתיות וזמינות בזמן אמת.</p>
+  <div id="moodResultBanner"></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="חיפוש לפי שם, תחום או התמחות...">
     <select id="areaFilter">
@@ -44,9 +49,12 @@
   </div>
 </section>
 
+<div id="statsBar"></div>
+
 <div class="categories" id="categories"></div>
 
 <section class="listings">
+  <div id="onlineBanner"></div>
   <div class="listings-header">
     <div>
       <h2>מטפלים מומלצים</h2>
@@ -63,21 +71,22 @@
 </section>
 
 <!-- Booking Modal -->
-<div class="modal-bg" id="modal">
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
+    <div id="modalFormWrap">
     <h3 id="modalTitle">תיאום פגישה</h3>
     <p class="modal-sub" id="modalSub"></p>
     <div class="form-row">
       <label>שם מלא</label>
-      <input type="text" placeholder="הקלד את שמך">
+      <input type="text" id="bName" placeholder="הקלד את שמך">
     </div>
     <div class="form-row">
       <label>טלפון</label>
-      <input type="tel" placeholder="050-0000000">
+      <input type="tel" id="bPhone" placeholder="050-0000000">
     </div>
     <div class="form-row">
       <label>סוג פגישה</label>
-      <select>
+      <select id="bType">
         <option>פגישת היכרות (חינם)</option>
         <option>פגישה רגילה</option>
         <option>פגישה מרחוק (זום)</option>
@@ -96,16 +105,53 @@
     </div>
     <div class="modal-actions">
       <button class="close-btn" onclick="closeModal()">ביטול</button>
-      <button class="confirm-btn" onclick="confirmBooking()">אשר תיאום</button>
+      <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()">אשר תיאום</button>
+    </div>
+    </div>
+    <div id="modalSuccessWrap" style="display:none;text-align:center;padding:32px 20px;">
+      <div style="font-size:52px;margin-bottom:16px;">🪷</div>
+      <h3 style="font-family:var(--font-display);font-size:22px;color:var(--ink);margin-bottom:8px;" id="successTitle"></h3>
+      <p style="color:var(--ink-soft);font-size:14px;line-height:1.65;" id="successMsg"></p>
+      <button class="btn-full" onclick="closeModal()" style="margin-top:20px;">סגירה</button>
     </div>
   </div>
 </div>
 
-<!-- Supabase client + TeraBoard data layer -->
+<!-- Supabase client + TeraBoard data layer + features -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
+<script src="js/features.js"></script>
 <script>
+const MOOD_L = {
+  skip: 'דלג/י',
+  s1title: 'מה קורה איתך?',
+  s1sub: 'בחר/י את מה שהכי קרוב למה שאת/ה מרגיש/ה',
+  s2title: 'איך את/ה מעדיף/ה פגישות?',
+  s3title: 'מתי תרצה/י להתחיל?',
+  moods: [
+    { icon: '😰', label: 'חרדה / לחץ',         cat: 'anxiety'     },
+    { icon: '😢', label: 'עצב / דיכאון',        cat: 'anxiety'     },
+    { icon: '💔', label: 'זוגיות / משפחה',      cat: 'couple'      },
+    { icon: '🌀', label: 'מאבד/ת כיוון',        cat: 'psy'         },
+    { icon: '😤', label: 'שחיקה / עייפות',      cat: 'mindfulness' },
+    { icon: '🌱', label: 'צמיחה אישית',         cat: 'psy'         },
+  ],
+  modes: [
+    { icon: '💻', label: 'אונליין בלבד',  val: 'online'  },
+    { icon: '📍', label: 'פנים אל פנים', val: 'local'   },
+    { icon: '🤷', label: 'לא משנה לי',   val: 'any'     },
+  ],
+  timing: [
+    { icon: '⚡', label: 'השבוע',          val: 'soon'     },
+    { icon: '📅', label: 'החודש',          val: 'month'    },
+    { icon: '👀', label: 'רק מסתכל/ת',    val: 'browsing' },
+  ],
+};
+const STATS_L = { online: 'אונליין עכשיו', rating: 'ממוצע', reviews: 'ביקורות' };
+const CTA_L   = { label: 'אני צריך/ה לדבר עכשיו' };
+let _onlineOnly = false;
+
 const categories = [
   { icon: '🧠', name: 'הכל', value: 'all' },
   { icon: '💭', name: 'פסיכותרפיה', value: 'psy' },
@@ -120,7 +166,8 @@ const categories = [
   { icon: '🌀', name: 'חרדה ודיכאון', value: 'anxiety' },
   { icon: '🪷', name: 'מיינדפולנס', value: 'mindfulness' },
   { icon: '💞', name: 'מיניות', value: 'sexual' },
-  { icon: '🕊️', name: 'אובדן ושכול', value: 'grief' }
+  { icon: '🕊️', name: 'אובדן ושכול', value: 'grief' },
+  { icon: '❤️', name: 'שמורים', value: 'favs', dynamic: true },
 ];
 
 let therapists = [
@@ -150,9 +197,12 @@ let selectedTherapistId = null;
 let currentList = [];
 
 function renderCategories() {
-  document.getElementById('categories').innerHTML = categories.map(c =>
-    `<div class="chip ${c.value === activeCategory ? 'active' : ''}" onclick="setCategory('${c.value}')">${c.icon} ${c.name}</div>`
-  ).join('');
+  const favCount = TeraFeatures.getFavCount();
+  document.getElementById('categories').innerHTML = categories.map(c => {
+    const label = c.dynamic ? `${c.icon} ${c.name}${favCount ? ` (${favCount})` : ''}` : `${c.icon} ${c.name}`;
+    if (c.value === 'favs' && favCount === 0 && activeCategory !== 'favs') return '';
+    return `<div class="chip ${c.value === activeCategory ? 'active' : ''}" onclick="setCategory('${c.value}')">${label}</div>`;
+  }).join('');
 }
 
 function setCategory(v) { activeCategory = v; renderCategories(); renderCards(); }
@@ -163,7 +213,9 @@ function renderCards() {
   const sort = document.getElementById('sortBy').value;
 
   let list = therapists.filter(t => {
+    if (activeCategory === 'favs') return TeraFeatures.isFav(t.id || t.name);
     if (activeCategory !== 'all' && t.cat !== activeCategory) return false;
+    if (_onlineOnly && !t.online) return false;
     if (area && t.area !== area) return false;
     if (q && !(t.name.toLowerCase().includes(q) || t.speciality.toLowerCase().includes(q))) return false;
     return true;
@@ -185,6 +237,7 @@ function renderCards() {
   document.getElementById('grid').innerHTML = list.map((t, i) => `
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
+        ${TeraFeatures.favButtonHTML(t.id || t.name)}
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
         ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
       </div>
@@ -225,15 +278,20 @@ function openModal(idx) {
     s.classList.add('selected');
   });
 }
-function closeModal() { document.getElementById('modal').classList.remove('active'); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  document.getElementById('modalFormWrap').style.display = '';
+  document.getElementById('modalSuccessWrap').style.display = 'none';
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+}
 function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
-  const m = document.getElementById('modal');
-  const name = m.querySelector('input[type=text]').value;
-  const phone = m.querySelector('input[type=tel]').value;
-  const type = m.querySelector('select').value;
-  const slotEl = m.querySelector('.slot.selected');
+  const btn = document.getElementById('confirmBtn'); btn.disabled = true;
+  const name = document.getElementById('bName').value;
+  const phone = document.getElementById('bPhone').value;
+  const type = document.getElementById('bType').value;
+  const slotEl = document.querySelector('.slot.selected');
   await TeraData.createBooking({
     therapist_id: selectedTherapistId,
     full_name: name || null,
@@ -242,16 +300,49 @@ async function confirmBooking() {
     notes: slotEl ? ('שעה מבוקשת: ' + slotEl.textContent) : null,
     status: 'pending'
   });
-  alert(`הפגישה עם ${selectedTherapist} תואמה בהצלחה! נשלח אליך אישור במייל.`);
-  closeModal();
+  btn.disabled = false;
+  document.getElementById('modalFormWrap').style.display = 'none';
+  document.getElementById('successTitle').textContent = `הפגישה עם ${selectedTherapist} תואמה! ✓`;
+  document.getElementById('successMsg').textContent = 'בקשתך נשלחה למטפל/ת. הם יחזרו אליך לאישור סופי בהקדם.';
+  document.getElementById('modalSuccessWrap').style.display = 'block';
+}
+
+function activateOnlineOnly(on) {
+  _onlineOnly = on;
+  const banner = document.getElementById('onlineBanner');
+  if (on) {
+    const count = therapists.filter(t => t.online).length;
+    banner.innerHTML = `<div class="online-banner">💚 <span>מציג <strong>${count}</strong> מטפלים זמינים עכשיו</span><button onclick="activateOnlineOnly(false)">✕</button></div>`;
+  } else { banner.innerHTML = ''; }
+  renderCards();
 }
 
 async function boot() {
   renderCategories();
   document.getElementById('grid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;color:#6b6862;padding:60px 20px;font-size:16px;">טוען מטפלים…</div>';
+    '<div style="grid-column:1/-1;text-align:center;color:var(--ink-soft);padding:60px 20px;font-size:16px;">טוען מטפלים…</div>';
   therapists = await TeraData.getTherapists(therapists);
-  renderCards();
+
+  TeraFeatures.setFavChangeHandler(() => { renderCategories(); renderCards(); });
+
+  TeraFeatures.showMoodMatch(MOOD_L, (result) => {
+    if (result.cat) {
+      activeCategory = result.cat;
+      const banner = document.getElementById('moodResultBanner');
+      if (banner) {
+        const labels = { anxiety:'חרדה ודיכאון', couple:'טיפול זוגי', psy:'פסיכותרפיה', mindfulness:'מיינדפולנס', cbt:'CBT', grief:'אובדן ושכול', trauma:'טראומה', addiction:'התמכרויות', kids:'טיפול בילדים', family:'משפחה', body:'גוף-נפש', sexual:'מיניות' };
+        banner.innerHTML = `<div class="mood-result-banner">✨ מציגים לך מטפלים ב<strong>${labels[result.cat] || result.cat}</strong></div>`;
+      }
+    }
+    if (result.mode === 'online') _onlineOnly = true;
+    renderCategories();
+    renderCards();
+    TeraFeatures.renderStats('statsBar', therapists, STATS_L);
+    TeraFeatures.initFloatingCTA(CTA_L, () => {
+      activateOnlineOnly(true);
+      document.querySelector('.listings')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
 }
 boot();
 </script>
