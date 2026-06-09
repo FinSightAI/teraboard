@@ -295,8 +295,8 @@ function renderProfileLink() {
           <code id="profileUrl" style="display:block;background:var(--bg2,#f3eefb);padding:6px 12px;border-radius:8px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--violet-d);">${url}</code>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;">
-          <button class="btn-outline" id="copyLinkBtn" onclick="copyProfileLink('${url}')" style="white-space:nowrap;">${T.copyLink}</button>
-          <a class="btn-outline" href="${url}" target="_blank" rel="noopener" style="white-space:nowrap;text-decoration:none;">${T.viewProfile}</a>
+          <button class="btn-outline" id="copyLinkBtn" data-url="${url.replace(/"/g,'%22')}" onclick="copyProfileLink(this.dataset.url)" style="white-space:nowrap;">${T.copyLink}</button>
+          <a class="btn-outline" href="${url.replace(/"/g,'%22')}" target="_blank" rel="noopener noreferrer" style="white-space:nowrap;text-decoration:none;">${T.viewProfile}</a>
         </div>
       </div>
     </div>`;

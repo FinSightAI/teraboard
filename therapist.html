@@ -26,7 +26,7 @@
 </header>
 
 <div class="profile-wrap" id="root">
-  <div class="muted" style="padding:60px 0;text-align:center;">טוען…</div>
+  <div class="muted" style="padding:60px 0;text-align:center;" id="loadingMsg">…</div>
 </div>
 
 <!-- Booking modal (same structure as the boards) -->
@@ -48,7 +48,7 @@
         <div class="slot">14:00</div><div class="slot">16:30</div><div class="slot">18:00</div>
       </div>
     </div>
-    <p id="formError" style="color:#b94569;font-size:13px;margin:0 0 8px;display:none;"></p>
+    <p id="formError" role="alert" aria-live="polite" style="color:#b94569;font-size:13px;margin:0 0 8px;display:none;"></p>
     <div class="modal-actions">
       <button class="close-btn" id="btnCancel" onclick="closeModal()"></button>
       <button class="confirm-btn" id="btnConfirm" onclick="confirmBooking()"></button>
@@ -69,7 +69,7 @@
 <script>
 // ---- i18n ----
 const I18N = {
-  he: { dir:'rtl', back:'חזרה ללוח', years:'שנות ניסיון', online:'אונליין', verified:'מאומת', per:'/ פגישה',
+  he: { dir:'rtl', back:'חזרה ללוח', years:'שנות ניסיון', online:'אונליין', verified:'מאומת', per:'/ פגישה', noBio:'לא הוזן מידע על המטפל/ת.',
         about:'על המטפל/ת', reviews:'ביקורות', noReviews:'אין ביקורות עדיין.', book:'תיאום פגישה',
         name:'שם מלא', phone:'טלפון', type:'סוג פגישה', pick:'בחר שעה — מחר',
         intro:'פגישת היכרות (חינם)', regular:'פגישה רגילה', remote:'פגישה מרחוק (זום)',
@@ -78,7 +78,7 @@ const I18N = {
         notFound:'המטפל/ת לא נמצא/ה.', bookWith:n=>`תיאום פגישה עם ${n}`, sub:'בחר את הפרטים שלך ושעה זמינה',
         share:'שתף פרופיל', shareCopied:'✓ הקישור הועתק',
         errName:'נא להזין שם מלא', errPhone:'נא להזין מספר טלפון', errSlot:'נא לבחור שעה מועדפת' },
-  en: { dir:'ltr', back:'Back to board', years:'yrs experience', online:'Online', verified:'Verified', per:'/ session',
+  en: { dir:'ltr', back:'Back to board', years:'yrs experience', online:'Online', verified:'Verified', per:'/ session', noBio:'No information provided yet.',
         about:'About', reviews:'Reviews', noReviews:'No reviews yet.', book:'Book a session',
         name:'Full name', phone:'Phone', type:'Session type', pick:'Pick a time — tomorrow',
         intro:'Intro call (free)', regular:'Regular session', remote:'Remote (Zoom)',
@@ -87,7 +87,7 @@ const I18N = {
         notFound:'Therapist not found.', bookWith:n=>`Book a session with ${n}`, sub:'Enter your details and pick an available time',
         share:'Share profile', shareCopied:'✓ Link copied',
         errName:'Please enter your full name', errPhone:'Please enter your phone number', errSlot:'Please pick a time slot' },
-  pt: { dir:'ltr', back:'Voltar ao quadro', years:'anos de exp.', online:'Online', verified:'Verificado', per:'/ sessão',
+  pt: { dir:'ltr', back:'Voltar ao quadro', years:'anos de exp.', online:'Online', verified:'Verificado', per:'/ sessão', noBio:'Nenhuma informação fornecida ainda.',
         about:'Sobre', reviews:'Avaliações', noReviews:'Ainda sem avaliações.', book:'Agendar sessão',
         name:'Nome completo', phone:'Telefone', type:'Tipo de sessão', pick:'Escolha um horário — amanhã',
         intro:'Conversa inicial (grátis)', regular:'Sessão padrão', remote:'Remota (Zoom)',
@@ -112,6 +112,8 @@ document.documentElement.dir = T.dir;
 const boardHref = 'therapist-board' + (lang==='he'?'':'-'+lang) + '.html';
 document.getElementById('logoLink').href = boardHref;
 document.getElementById('navBack').href = boardHref;
+const loadEl = document.getElementById('loadingMsg');
+if (loadEl) loadEl.textContent = ({he:'טוען…', en:'Loading…', pt:'Carregando…'})[lang] || '…';
 
 function setText() {
   document.getElementById('navBack').textContent = T.back;
@@ -198,7 +200,7 @@ function render() {
 
     <div class="profile-section">
       <h2>${T.about}</h2>
-      <div class="bio">${t.bio ? esc(t.bio) : '—'}</div>
+      <div class="bio">${t.bio ? esc(t.bio) : `<span class="muted">${T.noBio}</span>`}</div>
       <div class="book-cta" style="display:flex;gap:10px;">
         <button class="btn-full" onclick="openModal()" style="flex:1;">${T.book}</button>
         <button class="btn-outline" id="shareBtn" onclick="shareProfile()" style="white-space:nowrap;padding:0 18px;">${T.share}</button>

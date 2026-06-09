@@ -103,7 +103,7 @@
         <div class="slot">18:00</div>
       </div>
     </div>
-    <p id="formError" style="color:#b94569;font-size:13px;margin:0 0 8px;display:none;"></p>
+    <p id="formError" role="alert" aria-live="polite" style="color:#b94569;font-size:13px;margin:0 0 8px;display:none;"></p>
     <div class="modal-actions">
       <button class="close-btn" onclick="closeModal()">ביטול</button>
       <button class="confirm-btn" id="confirmBtn" onclick="confirmBooking()">אשר תיאום</button>
@@ -235,28 +235,29 @@ function renderCards() {
     return;
   }
 
+  const e = TeraData.esc, cu = TeraData.safeCssUrl;
   document.getElementById('grid').innerHTML = list.map((t, i) => `
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${TeraFeatures.favButtonHTML(t.id || t.name, 'he')}
-        ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
-        ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
+        ${t.badge ? `<div class="badge">${e(t.badge)}</div>` : ''}
+        ${cu(t.photo) ? `<div class="avatar" style="background-image:url('${cu(t.photo)}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${e(t.initial)}</div>`}
       </div>
       <div class="card-body">
-        <h3>${t.name}</h3>
-        <div class="speciality">${t.speciality}</div>
+        <h3>${e(t.name)}</h3>
+        <div class="speciality">${e(t.speciality)}</div>
         ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
-          <div>📍 ${t.area}</div>
-          <div>⏱ ${t.exp} שנות ניסיון</div>
+          <div>📍 ${e(t.area)}</div>
+          <div>⏱ ${e(t.exp)} שנות ניסיון</div>
           ${t.online ? '<div>💻 אונליין</div>' : ''}
         </div>
         <div class="rating">
           <div class="stars">${TeraData.starsHTML(t.rating)}</div>
-          <div class="rating-num">${t.rating}</div>
-          <div class="reviews-count">(${t.reviews} ביקורות)</div>
+          <div class="rating-num">${e(t.rating)}</div>
+          <div class="reviews-count">(${e(t.reviews)} ביקורות)</div>
         </div>
-        <div class="price">₪${t.price} <small>/ פגישה</small></div>
+        <div class="price">₪${e(t.price)} <small>/ פגישה</small></div>
       </div>
       <div class="card-footer">
         <button class="btn-outline" onclick="viewProfile(${i})">פרופיל מלא</button>

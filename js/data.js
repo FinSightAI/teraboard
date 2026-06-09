@@ -34,18 +34,30 @@
 
   function normWebsite(v) {
     if (!v) return null;
-    return /^https?:\/\//i.test(v) ? v : "https://" + v;
+    const url = /^https?:\/\//i.test(v) ? v : "https://" + v;
+    return /^https:\/\//i.test(url) ? url : null; // only https
   }
   function normInstagram(v) {
     if (!v) return null;
-    if (/^https?:\/\//i.test(v)) return v;
-    return "https://instagram.com/" + v.replace(/^@/, "");
+    if (/^https?:\/\//i.test(v)) return /^https:\/\//i.test(v) ? v : null;
+    return "https://instagram.com/" + v.replace(/^@/, "").replace(/[^a-zA-Z0-9._]/g, "");
+  }
+  // HTML-attribute-safe escape for href values
+  function escAttr(s) {
+    return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // CSS url()-safe: strip chars that could break out of url('...')
+  function safeCssUrl(s) {
+    if (!s || !/^https:\/\//i.test(s)) return "";
+    return s.replace(/['"\\\n\r\t]/g, "");
   }
 
   const TeraData = {
     configured,
     client,
     isLive: () => Boolean(client),
+    esc: (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])),
+    safeCssUrl,
 
     // Render filled/empty stars based on actual rating value.
     starsHTML(rating) {
@@ -64,7 +76,7 @@
       const base =
         "display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#ede8f5;text-decoration:none;font-size:16px;transition:background .2s;";
       const a = (href, label, icon) =>
-        `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}" onclick="event.stopPropagation()" style="${base}" onmouseover="this.style.background='#d4c6ed'" onmouseout="this.style.background='#ede8f5'">${icon}</a>`;
+        `<a href="${escAttr(href)}" target="_blank" rel="noopener noreferrer" title="${escAttr(label)}" aria-label="${escAttr(label)}" onclick="event.stopPropagation()" style="${base}" onmouseover="this.style.background='#d4c6ed'" onmouseout="this.style.background='#ede8f5'">${icon}</a>`;
       return (
         '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
         (w ? a(w, siteLabel, "🌐") : "") +
