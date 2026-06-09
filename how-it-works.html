@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TeraBoard</title>
+<title>Como funciona — TeraBoard</title>
+<meta name="description" content="Três passos simples para encontrar o terapeuta ideal. Busque, compare e agende no TeraBoard.">
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;800;900&family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Mulish:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/celestial.css">
@@ -29,7 +30,10 @@
     <div class="logo-mark">T</div>
     TeraBoard
   </a>
-  <nav><a id="navFind" href="therapist-board.html"></a></nav>
+  <nav>
+    <a id="navFind" href="therapist-board.html"></a>
+    <div class="lang-switch" id="langSwitch"></div>
+  </nav>
 </header>
 
 <div class="wrap" style="max-width:1040px;">
@@ -80,8 +84,13 @@ const boardHref = 'therapist-board' + (lang==='he'?'':'-'+lang) + '.html';
 document.documentElement.lang = lang;
 document.documentElement.dir = T.dir;
 document.title = 'TeraBoard — ' + T.navFind;
+document.title = 'TeraBoard — ' + T.navFind;
 document.getElementById('logoLink').href = boardHref;
 const nf = document.getElementById('navFind'); nf.href = boardHref; nf.textContent = T.navFind;
+document.getElementById('langSwitch').innerHTML =
+  `<a href="how-it-works.html?lang=he"${lang==='he'?' class="active"':''}>HE</a>` +
+  `<a href="how-it-works.html?lang=en"${lang==='en'?' class="active"':''}>EN</a>` +
+  `<a href="how-it-works.html?lang=pt"${lang==='pt'?' class="active"':''}>PT</a>`;
 document.getElementById('title').innerHTML = T.title;
 document.getElementById('sub').textContent = T.sub;
 document.getElementById('steps').innerHTML = T.steps.map((s,i) => `

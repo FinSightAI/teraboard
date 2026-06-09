@@ -154,7 +154,7 @@ const STR = {
     backendOff:'ה-backend לא מחובר עדיין.', fillEmail:'נא למלא אימייל וסיסמה.', confirmMail:'נשלח אליך מייל לאימות. אשר/י אותו ואז התחבר/י.',
     saved:'הפרופיל נשמר! יופיע בלוח לאחר אימות הרישיון.', saveFail:'שמירה נכשלה.', authFail:'אירעה שגיאה.',
     uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ',
-    profileLink:'הקישור שלך לפרופיל', copyLink:'העתק', copied:'✓ הועתק!',
+    profileLink:'הקישור שלך לפרופיל', copyLink:'העתק', copied:'✓ הועתק!', viewProfile:'פרופיל',
     resend:'שלח שוב', resendOk:'נשלח מייל נוסף. בדוק/י את תיבת הדואר.' },
   en: { dir:'ltr', navFind:'Find a therapist', heroH:'Join <span>TeraBoard</span> as a therapist', heroP:'Build a professional profile, receive new client inquiries, and manage your calendar and bookings — all in one place.',
     offline:'⚠️ Backend not connected yet (Supabase keys missing in js/config.js). This form is preview-only — real signup works as soon as keys are added.',
@@ -171,7 +171,7 @@ const STR = {
     backendOff:'Backend not connected yet.', fillEmail:'Please enter email and password.', confirmMail:'A verification email was sent. Confirm it, then log in.',
     saved:'Profile saved! It will appear on the board after license verification.', saveFail:'Save failed.', authFail:'An error occurred.',
     uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ',
-    profileLink:'Your profile link', copyLink:'Copy', copied:'✓ Copied!',
+    profileLink:'Your profile link', copyLink:'Copy', copied:'✓ Copied!', viewProfile:'View profile',
     resend:'Resend email', resendOk:'Another email was sent. Check your inbox.' },
   pt: { dir:'ltr', navFind:'Encontrar terapeuta', heroH:'Junte-se ao <span>TeraBoard</span> como terapeuta', heroP:'Crie um perfil profissional, receba contatos de novos pacientes e gerencie sua agenda e seus agendamentos — tudo em um só lugar.',
     offline:'⚠️ Backend ainda não conectado (faltam as chaves do Supabase em js/config.js). Este formulário é só de visualização — o cadastro real funciona assim que as chaves forem adicionadas.',
@@ -188,7 +188,7 @@ const STR = {
     backendOff:'Backend ainda não conectado.', fillEmail:'Preencha e-mail e senha.', confirmMail:'Um e-mail de verificação foi enviado. Confirme e depois entre.',
     saved:'Perfil salvo! Aparecerá no quadro após a verificação do registro.', saveFail:'Falha ao salvar.', authFail:'Ocorreu um erro.',
     uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ',
-    profileLink:'Seu link de perfil', copyLink:'Copiar', copied:'✓ Copiado!',
+    profileLink:'Seu link de perfil', copyLink:'Copiar', copied:'✓ Copiado!', viewProfile:'Ver perfil',
     resend:'Reenviar e-mail', resendOk:'Outro e-mail foi enviado. Verifique sua caixa de entrada.' },
 };
 const CATS = [
@@ -294,7 +294,10 @@ function renderProfileLink() {
           <div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px;">${T.profileLink}</div>
           <code id="profileUrl" style="display:block;background:var(--bg2,#f3eefb);padding:6px 12px;border-radius:8px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--violet-d);">${url}</code>
         </div>
-        <button class="btn-outline" id="copyLinkBtn" onclick="copyProfileLink('${url}')" style="white-space:nowrap;">${T.copyLink}</button>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="btn-outline" id="copyLinkBtn" onclick="copyProfileLink('${url}')" style="white-space:nowrap;">${T.copyLink}</button>
+          <a class="btn-outline" href="${url}" target="_blank" rel="noopener" style="white-space:nowrap;text-decoration:none;">${T.viewProfile}</a>
+        </div>
       </div>
     </div>`;
 }
@@ -343,7 +346,12 @@ function previewPhoto() {
 
 async function uploadTo(bucket, file, statusEl) {
   if (!file || !sb || !me) return null;
-  const path = `${me.id}/${Date.now()}-${file.name}`;
+  const MAX = bucket === 'avatars' ? 5 : 10; // MB
+  if (file.size > MAX * 1024 * 1024) {
+    if (statusEl) statusEl.textContent = T.uploadFail + `arquivo muito grande (máx ${MAX} MB)`;
+    return null;
+  }
+  const path = `${me.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
   if (statusEl) statusEl.textContent = T.uploading;
   const { error } = await sb.storage.from(bucket).upload(path, file, { upsert: true });
   if (error) { if (statusEl) statusEl.textContent = T.uploadFail + error.message; return null; }

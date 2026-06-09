@@ -3,16 +3,25 @@
 (function () {
   'use strict';
 
+  // ── Safe storage helpers ───────────────────────────────────
+  function lsGet(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+    catch (e) { return fallback; }
+  }
+  function lsSet(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* quota / private mode */ }
+  }
+  function ssGet(key) { try { return sessionStorage.getItem(key); } catch (e) { return null; } }
+  function ssSet(key, val) { try { sessionStorage.setItem(key, val); } catch (e) {} }
+
   // ── Favorites (localStorage) ───────────────────────────────
   const LS_KEY = 'tb_favs';
-  let _favSet = new Set(JSON.parse(localStorage.getItem(LS_KEY) || '[]'));
+  let _favSet = new Set(lsGet(LS_KEY, []));
   let _onFavChange = null;
-
-  function _saveFavs() { localStorage.setItem(LS_KEY, JSON.stringify([..._favSet])); }
 
   function toggleFav(key) {
     if (_favSet.has(key)) _favSet.delete(key); else _favSet.add(key);
-    _saveFavs();
+    lsSet(LS_KEY, [..._favSet]);
     document.querySelectorAll('.fav-btn').forEach(btn => {
       if (btn.dataset.key === String(key)) {
         const on = _favSet.has(key);
@@ -23,9 +32,10 @@
     if (_onFavChange) _onFavChange(_favSet.size);
   }
 
-  function favButtonHTML(key) {
+  function favButtonHTML(key, lang) {
+    const label = { he: 'שמור מטפל', en: 'Save therapist', pt: 'Salvar terapeuta' }[lang] || 'Save';
     const active = _favSet.has(String(key));
-    return `<button class="fav-btn${active ? ' active' : ''}" data-key="${key}" onclick="event.stopPropagation();TeraFeatures.toggleFav('${key}')" aria-label="Favoritar">${active ? '♥' : '♡'}</button>`;
+    return `<button class="fav-btn${active ? ' active' : ''}" data-key="${key}" onclick="event.stopPropagation();TeraFeatures.toggleFav('${key}')" aria-label="${label}">${active ? '♥' : '♡'}</button>`;
   }
 
   // ── Stats bar ──────────────────────────────────────────────
@@ -50,7 +60,14 @@
   let _moodCb = null, _moodResult = {};
 
   function showMoodMatch(L, onComplete) {
-    if (sessionStorage.getItem('tb_mood')) { onComplete({}); return; }
+    // Restore last mood result from session so the filter persists on refresh
+    const saved = ssGet('tb_mood_result');
+    if (ssGet('tb_mood') && saved) {
+      try { onComplete(JSON.parse(saved)); } catch (e) { onComplete({}); }
+      return;
+    }
+    if (ssGet('tb_mood')) { onComplete({}); return; }
+
     _moodCb = onComplete;
     _moodResult = {};
     const el = document.createElement('div');
@@ -103,7 +120,8 @@
   }
 
   function _closeMood(result) {
-    sessionStorage.setItem('tb_mood', '1');
+    ssSet('tb_mood', '1');
+    ssSet('tb_mood_result', JSON.stringify(result));
     const el = document.getElementById('moodOverlay');
     if (el) { el.classList.remove('active'); setTimeout(() => { el.remove(); document.body.style.overflow = ''; }, 330); }
     else { document.body.style.overflow = ''; }
@@ -111,35 +129,35 @@
   }
 
   // ── Floating CTA ───────────────────────────────────────────
+  let _scrollHandler = null;
+
   function initFloatingCTA(L, onClick) {
     const old = document.getElementById('floatingCTA');
     if (old) old.remove();
+    // Remove previous scroll listener to avoid accumulation
+    if (_scrollHandler) window.removeEventListener('scroll', _scrollHandler);
+
     const btn = document.createElement('button');
     btn.id = 'floatingCTA';
     btn.className = 'floating-cta cta-hidden';
     btn.innerHTML = `<span class="pulse-dot"></span><span class="cta-text">${L.label}</span>`;
     btn.addEventListener('click', onClick);
     document.body.appendChild(btn);
-    window.addEventListener('scroll', () => {
-      btn.classList.toggle('cta-hidden', window.scrollY < 220);
-    }, { passive: true });
+
+    _scrollHandler = () => btn.classList.toggle('cta-hidden', window.scrollY < 220);
+    window.addEventListener('scroll', _scrollHandler, { passive: true });
   }
 
   // ── Public API ─────────────────────────────────────────────
   window.TeraFeatures = {
-    // favorites
     toggleFav, favButtonHTML,
     isFav: k => _favSet.has(String(k)),
     getFavKeys: () => [..._favSet],
     getFavCount: () => _favSet.size,
     setFavChangeHandler: fn => { _onFavChange = fn; },
-    // stats
     renderStats,
-    // mood
     showMoodMatch,
-    // floating
     initFloatingCTA,
-    // mood step handlers (called from inline onclick in overlay HTML)
     _skip: () => _closeMood({}),
     _p1: cat => { _moodResult.cat = cat; _goStep(2); },
     _p2: val => { _moodResult.mode = val; _goStep(3); },

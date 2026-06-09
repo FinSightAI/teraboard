@@ -241,7 +241,7 @@ function renderCards() {
   document.getElementById('grid').innerHTML = list.map((t, i) => `
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
-        ${TeraFeatures.favButtonHTML(t.id || t.name)}
+        ${TeraFeatures.favButtonHTML(t.id || t.name, 'pt')}
         ${t.badge ? `<div class="badge">${t.badge}</div>` : ''}
         ${t.photo ? `<div class="avatar" style="background-image:url('${t.photo}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${t.initial}</div>`}
       </div>

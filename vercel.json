@@ -1,12 +1,10 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [
-    { "source": "/he", "destination": "/therapist-board.html" },
-    { "source": "/en", "destination": "/therapist-board-en.html" },
-    { "source": "/pt", "destination": "/therapist-board-pt.html" }
-  ],
   "rewrites": [
+    { "source": "/he",    "destination": "/therapist-board" },
+    { "source": "/en",    "destination": "/therapist-board-en" },
+    { "source": "/pt",    "destination": "/therapist-board-pt" },
     { "source": "/t/:id", "destination": "/therapist?id=:id" }
   ]
 }

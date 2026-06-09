@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=therapist-board.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeraBoard</title>
+<meta name="robots" content="noindex">
+<script>
+  // Route to the correct language board based on browser locale.
+  // Falls back to English for any unrecognised locale.
+  (function () {
+    var l = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    var dest = l.startsWith('pt') ? '/pt'
+             : (l.startsWith('he') || l.startsWith('iw')) ? '/he'
+             : '/en';
+    location.replace(dest);
+  })();
+</script>
 </head>
-<body>
-<script>window.location.replace('therapist-board.html');</script>
-<p>Redirecting to <a href="therapist-board.html">TeraBoard</a>...</p>
-</body>
+<body></body>
 </html>
