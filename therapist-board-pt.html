@@ -253,7 +253,7 @@ function renderCards() {
       <div class="card-body">
         <h3>${e(t.name)}</h3>
         <div class="speciality">${e(t.speciality)}</div>
-        ${_moodDone && _matchScores[t.id||t.name] ? `<div style="margin:2px 0 4px;">${TeraFeatures.matchScoreHTML(_matchScores[t.id||t.name])}</div>` : ''}
+        ${_moodDone && _matchScores[t.id||t.name] ? `<div style="margin:2px 0 4px;">${TeraFeatures.matchScoreHTML(_matchScores[t.id||t.name], 'pt')}</div>` : ''}
         ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${e(t.area)}</div>

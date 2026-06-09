@@ -167,9 +167,10 @@
     return out;
   }
 
-  function matchScoreHTML(score) {
+  function matchScoreHTML(score, lang) {
     if (!score) return '';
-    return `<span class="match-score${score >= 90 ? ' top' : ''}">${score}% match</span>`;
+    const word = { he: 'התאמה', pt: 'compatível', en: 'match' }[lang] || 'match';
+    return `<span class="match-score${score >= 90 ? ' top' : ''}">${score}% ${word}</span>`;
   }
 
   // ── Floating CTA ───────────────────────────────────────────
