@@ -168,18 +168,19 @@ const categories = [
   { icon: '🪷', name: 'מיינדפולנס', value: 'mindfulness' },
   { icon: '💞', name: 'מיניות', value: 'sexual' },
   { icon: '🕊️', name: 'אובדן ושכול', value: 'grief' },
+  { icon: '🟢', name: 'זמין/ה היום', value: 'today' },
   { icon: '❤️', name: 'שמורים', value: 'favs', dynamic: true },
 ];
 
 let therapists = [
-  { name: 'ד״ר נועה לוי', speciality: 'פסיכולוגית קלינית', cat: 'psy', area: 'תל אביב', online: true, rating: 4.9, reviews: 142, price: 450, exp: 12, initial: 'נ', badge: 'מומלץ', website: 'https://noa-levi.co.il', instagram: 'noa.levi.psy' },
-  { name: 'יואב כהן', speciality: 'מטפל זוגי וקבוצתי', cat: 'couple', area: 'ירושלים', online: true, rating: 4.8, reviews: 89, price: 380, exp: 8, initial: 'י' },
+  { name: 'ד״ר נועה לוי', speciality: 'פסיכולוגית קלינית', cat: 'psy', area: 'תל אביב', online: true, rating: 4.9, reviews: 142, price: 450, exp: 12, initial: 'נ', badge: 'מומלץ', website: 'https://noa-levi.co.il', instagram: 'noa.levi.psy', available_today: true, video_url: 'https://www.youtube.com/watch?v=MNjMRnv0kBQ' },
+  { name: 'יואב כהן', speciality: 'מטפל זוגי וקבוצתי', cat: 'couple', area: 'ירושלים', online: true, rating: 4.8, reviews: 89, price: 380, exp: 8, initial: 'י', available_today: true },
   { name: 'ד״ר שירה אברהם', speciality: 'CBT והפרעות חרדה', cat: 'cbt', area: 'תל אביב', online: false, rating: 5.0, reviews: 56, price: 500, exp: 15, initial: 'ש', badge: 'חדש' },
   { name: 'מיכל ברק', speciality: 'מטפלת באמנות', cat: 'art', area: 'חיפה', online: true, rating: 4.7, reviews: 78, price: 320, exp: 6, initial: 'מ' },
   { name: 'אסף רוזן', speciality: 'פסיכותרפיה דינמית', cat: 'psy', area: 'שרון', online: false, rating: 4.9, reviews: 203, price: 420, exp: 18, initial: 'א', badge: 'מומלץ' },
   { name: 'תמר ויסמן', speciality: 'מטפלת רגשית לילדים', cat: 'kids', area: 'תל אביב', online: true, rating: 4.8, reviews: 95, price: 360, exp: 9, initial: 'ת' },
   { name: 'ד״ר רונן שטרן', speciality: 'התמכרויות וסמים', cat: 'addiction', area: 'ירושלים', online: true, rating: 4.6, reviews: 67, price: 480, exp: 14, initial: 'ר' },
-  { name: 'יעל גולדמן', speciality: 'יוגה תרפיה וגוף-נפש', cat: 'body', area: 'אונליין', online: true, rating: 4.9, reviews: 124, price: 280, exp: 7, initial: 'י' },
+  { name: 'יעל גולדמן', speciality: 'יוגה תרפיה וגוף-נפש', cat: 'body', area: 'אונליין', online: true, rating: 4.9, reviews: 124, price: 280, exp: 7, initial: 'י', available_today: true },
   { name: 'דנה אלון', speciality: 'CBT לנוער', cat: 'cbt', area: 'חיפה', online: true, rating: 4.7, reviews: 41, price: 350, exp: 5, initial: 'ד' },
   { name: 'אורי פרידמן', speciality: 'טיפול זוגי IMAGO', cat: 'couple', area: 'תל אביב', online: false, rating: 5.0, reviews: 38, price: 550, exp: 11, initial: 'א', badge: 'חדש' },
   { name: 'נטע ברגר', speciality: 'אמנות וטראומה', cat: 'art', area: 'שרון', online: true, rating: 4.8, reviews: 72, price: 340, exp: 10, initial: 'נ' },
@@ -196,6 +197,7 @@ let activeCategory = 'all';
 let selectedTherapist = null;
 let selectedTherapistId = null;
 let currentList = [];
+let _moodDone = false, _matchScores = {};
 
 function renderCategories() {
   const favCount = TeraFeatures.getFavCount();
@@ -214,7 +216,8 @@ function renderCards() {
   const sort = document.getElementById('sortBy').value;
 
   let list = therapists.filter(t => {
-    if (activeCategory === 'favs') return TeraFeatures.isFav(t.id || t.name);
+    if (activeCategory === 'favs')  return TeraFeatures.isFav(t.id || t.name);
+    if (activeCategory === 'today') return t.available_today;
     if (activeCategory !== 'all' && t.cat !== activeCategory) return false;
     if (_onlineOnly && !t.online) return false;
     if (area && t.area !== area) return false;
@@ -240,12 +243,13 @@ function renderCards() {
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${TeraFeatures.favButtonHTML(t.id || t.name, 'he')}
-        ${t.badge ? `<div class="badge">${e(t.badge)}</div>` : ''}
+        ${t.available_today ? '<div class="badge badge-today">🟢 זמין/ה</div>' : (t.badge ? `<div class="badge">${e(t.badge)}</div>` : '')}
         ${cu(t.photo) ? `<div class="avatar" style="background-image:url('${cu(t.photo)}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${e(t.initial)}</div>`}
       </div>
       <div class="card-body">
         <h3>${e(t.name)}</h3>
         <div class="speciality">${e(t.speciality)}</div>
+        ${_moodDone && _matchScores[t.id||t.name] ? `<div style="margin:2px 0 4px;">${TeraFeatures.matchScoreHTML(_matchScores[t.id||t.name])}</div>` : ''}
         ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${e(t.area)}</div>
@@ -289,7 +293,7 @@ function closeModal() {
   document.getElementById('modalSuccessWrap').style.display = 'none';
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
 }
-function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
+function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); try{sessionStorage.setItem('tb_list',JSON.stringify(therapists));}catch(e){} location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
   const name = document.getElementById('bName').value.trim();
@@ -354,6 +358,7 @@ async function boot() {
       }
     }
     if (result.mode === 'online') _onlineOnly = true;
+    if (result.cat || result.mode) { _moodDone = true; _matchScores = TeraFeatures.computeMatchScores(therapists, result); }
     renderCategories();
     renderCards();
     TeraFeatures.renderStats('statsBar', therapists, STATS_L);
@@ -361,6 +366,7 @@ async function boot() {
       activateOnlineOnly(true);
       document.querySelector('.listings')?.scrollIntoView({ behavior: 'smooth' });
     });
+    TeraFeatures.initCrisisBar('he');
   });
 }
 boot();

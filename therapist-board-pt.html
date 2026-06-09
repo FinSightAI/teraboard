@@ -175,14 +175,16 @@ const categories = [
   { icon: '🪷', name: 'Mindfulness', value: 'mindfulness' },
   { icon: '💞', name: 'Sexologia', value: 'sexual' },
   { icon: '🕊️', name: 'Luto e Perda', value: 'grief' },
+  { icon: '🟢', name: 'Disponível hoje', value: 'today' },
   { icon: '❤️', name: 'Salvos', value: 'favs', dynamic: true },
 ];
+let _moodDone = false, _matchScores = {};
 
 let therapists = [
-  { name: 'Dra. Mariana Silva', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 168, price: 280, exp: 13, initial: 'M', badge: 'Recomendado', photo: 'https://randomuser.me/api/portraits/women/68.jpg', website: 'https://marianasilva.com.br', instagram: 'mariana.psi' },
-  { name: 'Rafael Oliveira', speciality: 'Terapeuta de Casais', cat: 'couple', area: 'Rio de Janeiro', online: true, rating: 4.8, reviews: 94, price: 240, exp: 9, initial: 'R', photo: 'https://randomuser.me/api/portraits/men/32.jpg' },
+  { name: 'Dra. Mariana Silva', speciality: 'Psicóloga Clínica', cat: 'psy', area: 'São Paulo', online: true, rating: 4.9, reviews: 168, price: 280, exp: 13, initial: 'M', badge: 'Recomendado', photo: 'https://randomuser.me/api/portraits/women/68.jpg', website: 'https://marianasilva.com.br', instagram: 'mariana.psi', whatsapp: '+5511998760001', available_today: true, video_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  { name: 'Rafael Oliveira', speciality: 'Terapeuta de Casais', cat: 'couple', area: 'Rio de Janeiro', online: true, rating: 4.8, reviews: 94, price: 240, exp: 9, initial: 'R', photo: 'https://randomuser.me/api/portraits/men/32.jpg', whatsapp: '+5521987650002', available_today: true },
   { name: 'Dra. Camila Santos', speciality: 'TCC e Ansiedade', cat: 'cbt', area: 'São Paulo', online: false, rating: 5.0, reviews: 61, price: 300, exp: 15, initial: 'C', badge: 'Novo', photo: 'https://randomuser.me/api/portraits/women/44.jpg' },
-  { name: 'Juliana Costa', speciality: 'Arteterapeuta', cat: 'art', area: 'Belo Horizonte', online: true, rating: 4.7, reviews: 73, price: 200, exp: 7, initial: 'J', photo: 'https://randomuser.me/api/portraits/women/12.jpg' },
+  { name: 'Juliana Costa', speciality: 'Arteterapeuta', cat: 'art', area: 'Belo Horizonte', online: true, rating: 4.7, reviews: 73, price: 200, exp: 7, initial: 'J', photo: 'https://randomuser.me/api/portraits/women/12.jpg', whatsapp: '+5531976540003' },
   { name: 'Bruno Almeida', speciality: 'Psicoterapia Psicodinâmica', cat: 'psy', area: 'Curitiba', online: false, rating: 4.9, reviews: 210, price: 260, exp: 18, initial: 'B', badge: 'Recomendado', photo: 'https://randomuser.me/api/portraits/men/52.jpg' },
   { name: 'Dra. Patrícia Ferreira', speciality: 'Terapia Infantil', cat: 'kids', area: 'São Paulo', online: true, rating: 4.8, reviews: 88, price: 220, exp: 10, initial: 'P', photo: 'https://randomuser.me/api/portraits/women/29.jpg' },
   { name: 'Lucas Rodrigues', speciality: 'Recuperação de Dependências', cat: 'addiction', area: 'Rio de Janeiro', online: true, rating: 4.6, reviews: 67, price: 300, exp: 14, initial: 'L', photo: 'https://randomuser.me/api/portraits/men/76.jpg' },
@@ -219,6 +221,7 @@ function renderCards() {
 
   let list = therapists.filter(t => {
     if (activeCategory === 'favs') return TeraFeatures.isFav(t.id || t.name);
+    if (activeCategory === 'today') return t.available_today;
     if (activeCategory !== 'all' && t.cat !== activeCategory) return false;
     if (_onlineOnly && !t.online) return false;
     if (area && t.area !== area) return false;
@@ -244,12 +247,13 @@ function renderCards() {
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${TeraFeatures.favButtonHTML(t.id || t.name, 'pt')}
-        ${t.badge ? `<div class="badge">${e(t.badge)}</div>` : ''}
+        ${t.available_today ? '<div class="badge badge-today">🟢 Disponível</div>' : (t.badge ? `<div class="badge">${e(t.badge)}</div>` : '')}
         ${cu(t.photo) ? `<div class="avatar" style="background-image:url('${cu(t.photo)}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${e(t.initial)}</div>`}
       </div>
       <div class="card-body">
         <h3>${e(t.name)}</h3>
         <div class="speciality">${e(t.speciality)}</div>
+        ${_moodDone && _matchScores[t.id||t.name] ? `<div style="margin:2px 0 4px;">${TeraFeatures.matchScoreHTML(_matchScores[t.id||t.name])}</div>` : ''}
         ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${e(t.area)}</div>
@@ -293,7 +297,7 @@ function closeModal() {
   document.getElementById('modalSuccessWrap').style.display = 'none';
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
 }
-function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
+function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'pt'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); sessionStorage.setItem('tb_list',JSON.stringify(currentList)); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
   const name = document.getElementById('bName').value.trim();
@@ -362,6 +366,8 @@ async function boot() {
       }
     }
     if (result.mode === 'online') _onlineOnly = true;
+    _moodDone = true;
+    _matchScores = TeraFeatures.computeMatchScores(therapists, result);
     renderCategories();
     renderCards();
     TeraFeatures.renderStats('statsBar', therapists, STATS_L);
@@ -371,6 +377,7 @@ async function boot() {
       document.querySelector('.listings')?.scrollIntoView({ behavior: 'smooth' });
     });
   });
+  TeraFeatures.initCrisisBar('pt');
 }
 boot();
 </script>

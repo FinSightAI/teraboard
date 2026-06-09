@@ -128,6 +128,50 @@
     if (_moodCb) _moodCb(result);
   }
 
+  // ── Crisis resources bar ──────────────────────────────────
+  const CRISIS = {
+    he: { text:'במצוקה נפשית?', href:'tel:1201', label:'ער"ן 1201', extra:' | משמר: 1201', dismiss:'סגור' },
+    en: { text:'In crisis?', href:'tel:988', label:'988 Lifeline (US)', extra:' · 116 123 (UK)', dismiss:'Close' },
+    pt: { text:'Em crise?', href:'tel:188', label:'CVV 188 (gratuito 24h)', extra:' | CAPS local', dismiss:'Fechar' },
+  };
+
+  function initCrisisBar(lang) {
+    if (ssGet('tb_crisis') || document.getElementById('crisisBar')) return;
+    const c = CRISIS[lang] || CRISIS.en;
+    const bar = document.createElement('div');
+    bar.id = 'crisisBar';
+    bar.innerHTML = `<span>🆘 ${c.text} <a href="${c.href}" class="crisis-link">${c.label}</a>${c.extra}</span><button class="crisis-dismiss" onclick="TeraFeatures.dismissCrisis()" aria-label="${c.dismiss}">✕</button>`;
+    document.body.appendChild(bar);
+    document.body.style.paddingBottom = '52px';
+  }
+
+  function dismissCrisis() {
+    ssSet('tb_crisis', '1');
+    const bar = document.getElementById('crisisBar');
+    if (bar) { bar.style.transition='opacity .25s'; bar.style.opacity='0'; setTimeout(()=>{ bar.remove(); document.body.style.paddingBottom=''; },260); }
+  }
+
+  // ── Match score ────────────────────────────────────────────
+  function computeMatchScores(therapists, result) {
+    const out = {};
+    therapists.forEach(t => {
+      let s = 50;
+      if (result.cat && t.cat === result.cat) s += 35;
+      else if (result.cat) s += 5;
+      if (result.mode === 'online' && t.online)      s += 10;
+      else if (result.mode === 'local' && !t.online) s += 10;
+      else if (result.mode === 'any')                 s += 5;
+      s += Math.round((Number(t.rating) || 4.5) * 2);
+      out[t.id || t.name] = Math.min(99, Math.max(61, s));
+    });
+    return out;
+  }
+
+  function matchScoreHTML(score) {
+    if (!score) return '';
+    return `<span class="match-score${score >= 90 ? ' top' : ''}">${score}% match</span>`;
+  }
+
   // ── Floating CTA ───────────────────────────────────────────
   let _scrollHandler = null;
 
@@ -158,6 +202,8 @@
     renderStats,
     showMoodMatch,
     initFloatingCTA,
+    initCrisisBar, dismissCrisis,
+    computeMatchScores, matchScoreHTML,
     _skip: () => _closeMood({}),
     _p1: cat => { _moodResult.cat = cat; _goStep(2); },
     _p2: val => { _moodResult.mode = val; _goStep(3); },

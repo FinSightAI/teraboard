@@ -112,6 +112,18 @@
         <input type="checkbox" id="pOnline">
         <label for="pOnline" style="margin:0;" data-i18n="onlineLabel"></label>
       </div>
+      <div class="form-row check">
+        <input type="checkbox" id="pAvailableToday">
+        <label for="pAvailableToday" style="margin:0;" data-i18n="availableToday"></label>
+      </div>
+      <div class="form-row">
+        <label data-i18n="whatsapp"></label>
+        <input type="tel" id="pWhatsapp" data-ph="whatsappPh">
+      </div>
+      <div class="form-row">
+        <label data-i18n="videoUrl"></label>
+        <input type="url" id="pVideoUrl" data-ph="videoUrlPh">
+      </div>
       <div class="form-row">
         <label data-i18n="licenseUpload"></label>
         <input type="file" id="pLicenseFile" accept="image/*,application/pdf">
@@ -120,8 +132,16 @@
       <button class="btn-full" id="saveBtn" data-i18n="save" onclick="saveProfile()"></button>
     </div>
 
-    <!-- Shareable profile link — shown only after profile is saved -->
+    <!-- Shareable profile link + QR code — shown only after profile is saved -->
     <div id="profileLinkSection"></div>
+    <div id="qrSection" style="display:none;" class="card-box">
+      <h2 data-i18n="qrTitle"></h2>
+      <p class="sub" data-i18n="qrHint"></p>
+      <div class="qr-wrap">
+        <div id="qrCanvas"></div>
+        <button class="btn-outline" style="margin-top:14px;" onclick="downloadQR()" data-i18n="qrDownload"></button>
+      </div>
+    </div>
 
     <div class="card-box">
       <h2 data-i18n="bookingsTitle"></h2>
@@ -134,6 +154,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script>
@@ -155,7 +176,9 @@ const STR = {
     saved:'הפרופיל נשמר! יופיע בלוח לאחר אימות הרישיון.', saveFail:'שמירה נכשלה.', authFail:'אירעה שגיאה.',
     uploading:'מעלה…', uploaded:'✓ הקובץ הועלה.', uploadFail:'העלאה נכשלה: ', tooBig:n=>`קובץ גדול מדי (מקסימום ${n} MB)`,
     profileLink:'הקישור שלך לפרופיל', copyLink:'העתק', copied:'✓ הועתק!', viewProfile:'פרופיל',
-    resend:'שלח שוב', resendOk:'נשלח מייל נוסף. בדוק/י את תיבת הדואר.' },
+    resend:'שלח שוב', resendOk:'נשלח מייל נוסף. בדוק/י את תיבת הדואר.',
+    whatsapp:'וואטסאפ (מספר עם קידומת)', whatsappPh:'+972501234567', videoUrl:'סרטון היכרות (YouTube/Vimeo)', videoUrlPh:'https://youtube.com/watch?v=...',
+    availableToday:'זמין/ה היום לפגישה', qrTitle:'קוד QR לפרופיל שלך', qrHint:'שתף/י את הקוד בכרטיס ביקור, בסטוריז או על גבי מצגות.', qrDownload:'הורד קוד QR' },
   en: { dir:'ltr', navFind:'Find a therapist', heroH:'Join <span>TeraBoard</span> as a therapist', heroP:'Build a professional profile, receive new client inquiries, and manage your calendar and bookings — all in one place.',
     offline:'⚠️ Backend not connected yet (Supabase keys missing in js/config.js). This form is preview-only — real signup works as soon as keys are added.',
     tabSignup:'Sign up', tabLogin:'Log in', authSignup:'Create account', authLogin:'Log in',
@@ -172,7 +195,9 @@ const STR = {
     saved:'Profile saved! It will appear on the board after license verification.', saveFail:'Save failed.', authFail:'An error occurred.',
     uploading:'Uploading…', uploaded:'✓ File uploaded.', uploadFail:'Upload failed: ', tooBig:n=>`file too large (max ${n} MB)`,
     profileLink:'Your profile link', copyLink:'Copy', copied:'✓ Copied!', viewProfile:'View profile',
-    resend:'Resend email', resendOk:'Another email was sent. Check your inbox.' },
+    resend:'Resend email', resendOk:'Another email was sent. Check your inbox.',
+    whatsapp:'WhatsApp (with country code)', whatsappPh:'+15551234567', videoUrl:'Intro video (YouTube/Vimeo)', videoUrlPh:'https://youtube.com/watch?v=...',
+    availableToday:'Available today for sessions', qrTitle:'Your profile QR code', qrHint:'Share this on business cards, stories, or presentations.', qrDownload:'Download QR code' },
   pt: { dir:'ltr', navFind:'Encontrar terapeuta', heroH:'Junte-se ao <span>TeraBoard</span> como terapeuta', heroP:'Crie um perfil profissional, receba contatos de novos pacientes e gerencie sua agenda e seus agendamentos — tudo em um só lugar.',
     offline:'⚠️ Backend ainda não conectado (faltam as chaves do Supabase em js/config.js). Este formulário é só de visualização — o cadastro real funciona assim que as chaves forem adicionadas.',
     tabSignup:'Cadastrar', tabLogin:'Entrar', authSignup:'Criar conta', authLogin:'Entrar',
@@ -189,7 +214,9 @@ const STR = {
     saved:'Perfil salvo! Aparecerá no quadro após a verificação do registro.', saveFail:'Falha ao salvar.', authFail:'Ocorreu um erro.',
     uploading:'Enviando…', uploaded:'✓ Arquivo enviado.', uploadFail:'Falha no envio: ', tooBig:n=>`arquivo muito grande (máx ${n} MB)`,
     profileLink:'Seu link de perfil', copyLink:'Copiar', copied:'✓ Copiado!', viewProfile:'Ver perfil',
-    resend:'Reenviar e-mail', resendOk:'Outro e-mail foi enviado. Verifique sua caixa de entrada.' },
+    resend:'Reenviar e-mail', resendOk:'Outro e-mail foi enviado. Verifique sua caixa de entrada.',
+    whatsapp:'WhatsApp (com código do país)', whatsappPh:'+5511987654321', videoUrl:'Vídeo de apresentação (YouTube/Vimeo)', videoUrlPh:'https://youtube.com/watch?v=...',
+    availableToday:'Disponível hoje para sessões', qrTitle:'QR code do seu perfil', qrHint:'Compartilhe no cartão de visita, stories ou apresentações.', qrDownload:'Baixar QR code' },
 };
 const CATS = [
   { v:'psy',        he:'פסיכותרפיה',   en:'Psychotherapy',          pt:'Psicoterapia' },
@@ -284,7 +311,7 @@ async function resendEmail() {
 function renderProfileLink() {
   const el = document.getElementById('profileLinkSection');
   if (!el) return;
-  if (!myTherapist || !myTherapist.id) { el.innerHTML = ''; return; }
+  if (!myTherapist || !myTherapist.id) { el.innerHTML = ''; document.getElementById('qrSection').style.display = 'none'; return; }
   const url = `${location.origin}/t/${myTherapist.id}`;
   el.innerHTML = `
     <div class="card-box" style="padding:20px 24px;">
@@ -300,6 +327,15 @@ function renderProfileLink() {
         </div>
       </div>
     </div>`;
+  // QR code
+  const qrSec = document.getElementById('qrSection');
+  const qrCanvas = document.getElementById('qrCanvas');
+  if (qrSec && qrCanvas && window.QRCode) {
+    qrCanvas.innerHTML = '';
+    new QRCode(qrCanvas, { text: url, width: 200, height: 200, colorDark:'#2c2440', colorLight:'#fdfbff', correctLevel: QRCode.CorrectLevel.M });
+    qrSec.style.display = '';
+    window._qrUrl = url;
+  }
 }
 
 function copyProfileLink(url) {
@@ -307,6 +343,15 @@ function copyProfileLink(url) {
     const btn = document.getElementById('copyLinkBtn');
     if (btn) { btn.textContent = T.copied; setTimeout(() => { btn.textContent = T.copyLink; }, 2000); }
   }).catch(() => { prompt(T.profileLink, url); });
+}
+
+function downloadQR() {
+  const canvas = document.querySelector('#qrCanvas canvas');
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'teraboard-qr.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
 }
 
 async function loadSession() {
@@ -336,6 +381,9 @@ function fillProfile() {
   pPrice.value = t.price || ''; pExp.value = t.exp || ''; pBio.value = t.bio || '';
   pLicense.value = t.license_number || ''; pWebsite.value = t.website_url || '';
   pInstagram.value = t.instagram || ''; pOnline.checked = Boolean(t.online);
+  document.getElementById('pWhatsapp').value = t.whatsapp || '';
+  document.getElementById('pVideoUrl').value = t.video_url || '';
+  document.getElementById('pAvailableToday').checked = Boolean(t.available_today);
   if (t.photo_url) document.getElementById('photoPreview').style.backgroundImage = `url('${t.photo_url}')`;
 }
 
@@ -374,6 +422,9 @@ async function saveProfile() {
       bio: pBio.value.trim(), license_number: pLicense.value.trim(),
       website_url: pWebsite.value.trim() || null, instagram: pInstagram.value.trim() || null,
       online: pOnline.checked, photo_url: photoUrl, initial: (pName.value.trim()[0] || 'T'),
+      whatsapp: document.getElementById('pWhatsapp').value.trim() || null,
+      video_url: document.getElementById('pVideoUrl').value.trim() || null,
+      available_today: document.getElementById('pAvailableToday').checked,
     };
     let res;
     if (myTherapist) res = await sb.from('therapists').update(payload).eq('id', myTherapist.id).select().single();

@@ -77,7 +77,8 @@ const I18N = {
         bookedTitle:n=>`הפגישה עם ${n} תואמה! ✓`, bookedMsg:'בקשתך נשלחה למטפל/ת. הם יחזרו אליך לאישור סופי בהקדם.',
         notFound:'המטפל/ת לא נמצא/ה.', bookWith:n=>`תיאום פגישה עם ${n}`, sub:'בחר את הפרטים שלך ושעה זמינה',
         share:'שתף פרופיל', shareCopied:'✓ הקישור הועתק',
-        errName:'נא להזין שם מלא', errPhone:'נא להזין מספר טלפון', errSlot:'נא לבחור שעה מועדפת' },
+        errName:'נא להזין שם מלא', errPhone:'נא להזין מספר טלפון', errSlot:'נא לבחור שעה מועדפת',
+        videoIntro:'סרטון היכרות', similarTitle:'מטפלים דומים', similarNo:'אין מטפלים דומים עדיין.' },
   en: { dir:'ltr', back:'Back to board', years:'yrs experience', online:'Online', verified:'Verified', per:'/ session', noBio:'No information provided yet.',
         about:'About', reviews:'Reviews', noReviews:'No reviews yet.', book:'Book a session',
         name:'Full name', phone:'Phone', type:'Session type', pick:'Pick a time — tomorrow',
@@ -86,7 +87,8 @@ const I18N = {
         bookedTitle:n=>`Session with ${n} booked! ✓`, bookedMsg:'Your request has been sent to the therapist. They will be in touch to confirm shortly.',
         notFound:'Therapist not found.', bookWith:n=>`Book a session with ${n}`, sub:'Enter your details and pick an available time',
         share:'Share profile', shareCopied:'✓ Link copied',
-        errName:'Please enter your full name', errPhone:'Please enter your phone number', errSlot:'Please pick a time slot' },
+        errName:'Please enter your full name', errPhone:'Please enter your phone number', errSlot:'Please pick a time slot',
+        videoIntro:'Video intro', similarTitle:'Similar therapists', similarNo:'No similar therapists found.' },
   pt: { dir:'ltr', back:'Voltar ao quadro', years:'anos de exp.', online:'Online', verified:'Verificado', per:'/ sessão', noBio:'Nenhuma informação fornecida ainda.',
         about:'Sobre', reviews:'Avaliações', noReviews:'Ainda sem avaliações.', book:'Agendar sessão',
         name:'Nome completo', phone:'Telefone', type:'Tipo de sessão', pick:'Escolha um horário — amanhã',
@@ -95,7 +97,8 @@ const I18N = {
         bookedTitle:n=>`Sessão com ${n} agendada! ✓`, bookedMsg:'Sua solicitação foi enviada ao terapeuta. Eles entrarão em contato para confirmação em breve.',
         notFound:'Terapeuta não encontrado.', bookWith:n=>`Agendar sessão com ${n}`, sub:'Preencha seus dados e escolha um horário disponível',
         share:'Compartilhar perfil', shareCopied:'✓ Link copiado',
-        errName:'Informe seu nome completo', errPhone:'Informe seu telefone', errSlot:'Selecione um horário disponível' },
+        errName:'Informe seu nome completo', errPhone:'Informe seu telefone', errSlot:'Selecione um horário disponível',
+        videoIntro:'Vídeo de apresentação', similarTitle:'Terapeutas semelhantes', similarNo:'Nenhum terapeuta semelhante encontrado.' },
 };
 const CUR = { he:'₪', en:'$', pt:'R$' };
 
@@ -207,12 +210,26 @@ function render() {
       </div>
     </div>
 
+    ${TeraData.safeEmbedUrl(t.video_url) ? `
+    <div class="profile-section">
+      <h2>${T.videoIntro}</h2>
+      <div class="video-wrap">
+        <iframe src="${TeraData.safeEmbedUrl(t.video_url)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="${esc(t.name)} — ${T.videoIntro}"></iframe>
+      </div>
+    </div>` : ''}
+
     <div class="profile-section">
       <h2>${T.reviews}</h2>
       <div id="reviews"><div class="muted">${T.noReviews}</div></div>
     </div>
+
+    <div class="similar-section" id="similarSection" style="display:none;">
+      <h2>${T.similarTitle}</h2>
+      <div class="similar-grid" id="similarGrid"></div>
+    </div>
   `;
   loadReviews();
+  loadSimilar();
 }
 
 async function loadReviews() {
@@ -224,6 +241,40 @@ async function loadReviews() {
       <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
       <div class="r-comment">${esc(r.comment || '')}</div>
     </div>`).join('');
+}
+
+function loadSimilar() {
+  if (!therapist) return;
+  let list = [];
+  try { list = JSON.parse(sessionStorage.getItem('tb_list') || '[]'); } catch(e) { return; }
+  if (!Array.isArray(list) || !list.length) return;
+  const similar = list.filter(t => {
+    const key = t.id || t.name;
+    const curKey = therapist.id || therapist.name;
+    return key !== curKey && (t.cat === therapist.cat || t.online === therapist.online);
+  }).slice(0, 4);
+  if (!similar.length) return;
+  const section = document.getElementById('similarSection');
+  const grid = document.getElementById('similarGrid');
+  if (!section || !grid) return;
+  const cu = TeraData.safeCssUrl;
+  grid.innerHTML = similar.map((t, i) => `
+    <div class="similar-card" onclick="goToSimilar(${i})" style="cursor:pointer;" data-idx="${i}">
+      <div class="s-av">${cu(t.photo) ? `<div style="width:100%;height:100%;border-radius:50%;background-image:url('${cu(t.photo)}');background-size:cover;background-position:center;"></div>` : esc(t.initial || (t.name||'?')[0])}</div>
+      <div class="s-name">${esc(t.name)}</div>
+      <div class="s-spec">${esc(t.speciality)}</div>
+      <div class="s-price">${cur}${esc(t.price)}</div>
+    </div>`).join('');
+  section.style.display = '';
+  window._similarList = similar;
+}
+
+function goToSimilar(i) {
+  const t = (window._similarList || [])[i];
+  if (!t) return;
+  sessionStorage.setItem('tb_profile', JSON.stringify(t));
+  sessionStorage.setItem('tb_lang', lang);
+  location.href = t.id ? `/t/${encodeURIComponent(t.id)}?lang=${lang}` : `therapist.html?lang=${lang}`;
 }
 
 // ---- share ----

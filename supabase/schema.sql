@@ -188,6 +188,21 @@ create policy "avatars_public_read"
   using (bucket_id = 'avatars');
 
 -- ============================================================
+-- Column additions (idempotent via DO block)
+-- ============================================================
+do $$ begin
+  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='therapists' and column_name='whatsapp') then
+    alter table public.therapists add column whatsapp text;
+  end if;
+  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='therapists' and column_name='video_url') then
+    alter table public.therapists add column video_url text;
+  end if;
+  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='therapists' and column_name='available_today') then
+    alter table public.therapists add column available_today boolean not null default false;
+  end if;
+end $$;
+
+-- ============================================================
 -- Seed data — the 12 sample therapists from the prototype
 -- (idempotent: only inserts if the table is empty)
 -- ============================================================

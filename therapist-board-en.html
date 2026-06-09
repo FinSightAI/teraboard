@@ -167,18 +167,19 @@ const categories = [
   { icon: '🪷', name: 'Mindfulness', value: 'mindfulness' },
   { icon: '💞', name: 'Sex Therapy', value: 'sexual' },
   { icon: '🕊️', name: 'Grief & Loss', value: 'grief' },
+  { icon: '🟢', name: 'Available today', value: 'today' },
   { icon: '❤️', name: 'Saved', value: 'favs', dynamic: true },
 ];
 
 let therapists = [
-  { name: 'Dr. Naomi Levi', speciality: 'Clinical Psychologist', cat: 'psy', area: 'New York', online: true, rating: 4.9, reviews: 142, price: 180, exp: 12, initial: 'N', badge: 'Recommended', website: 'https://noa-levi.com', instagram: 'noa.levi.psy' },
+  { name: 'Dr. Naomi Levi', speciality: 'Clinical Psychologist', cat: 'psy', area: 'New York', online: true, rating: 4.9, reviews: 142, price: 180, exp: 12, initial: 'N', badge: 'Recommended', website: 'https://noa-levi.com', instagram: 'noa.levi.psy', available_today: true, video_url: 'https://www.youtube.com/watch?v=MNjMRnv0kBQ' },
   { name: 'Yoav Cohen', speciality: 'Couples & Group Therapist', cat: 'couple', area: 'London', online: true, rating: 4.8, reviews: 89, price: 150, exp: 8, initial: 'Y' },
   { name: 'Dr. Shira Abraham', speciality: 'CBT & Anxiety Disorders', cat: 'cbt', area: 'New York', online: false, rating: 5.0, reviews: 56, price: 200, exp: 15, initial: 'S', badge: 'New' },
   { name: 'Michal Barak', speciality: 'Art Therapist', cat: 'art', area: 'Berlin', online: true, rating: 4.7, reviews: 78, price: 130, exp: 6, initial: 'M' },
   { name: 'Asaf Rosen', speciality: 'Psychodynamic Therapy', cat: 'psy', area: 'Los Angeles', online: false, rating: 4.9, reviews: 203, price: 170, exp: 18, initial: 'A', badge: 'Recommended' },
   { name: 'Tamar Wiseman', speciality: 'Child Emotional Therapy', cat: 'kids', area: 'New York', online: true, rating: 4.8, reviews: 95, price: 140, exp: 9, initial: 'T' },
   { name: 'Dr. Ronen Stern', speciality: 'Addiction Recovery', cat: 'addiction', area: 'London', online: true, rating: 4.6, reviews: 67, price: 190, exp: 14, initial: 'R' },
-  { name: 'Yael Goldman', speciality: 'Yoga Therapy & Body-Mind', cat: 'body', area: 'Online', online: true, rating: 4.9, reviews: 124, price: 110, exp: 7, initial: 'Y' },
+  { name: 'Yael Goldman', speciality: 'Yoga Therapy & Body-Mind', cat: 'body', area: 'Online', online: true, rating: 4.9, reviews: 124, price: 110, exp: 7, initial: 'Y', available_today: true },
   { name: 'Dana Alon', speciality: 'CBT for Teens', cat: 'cbt', area: 'Berlin', online: true, rating: 4.7, reviews: 41, price: 140, exp: 5, initial: 'D' },
   { name: 'Uri Friedman', speciality: 'IMAGO Couples Therapy', cat: 'couple', area: 'New York', online: false, rating: 5.0, reviews: 38, price: 220, exp: 11, initial: 'U', badge: 'New' },
   { name: 'Neta Berger', speciality: 'Art & Trauma Therapy', cat: 'art', area: 'Los Angeles', online: true, rating: 4.8, reviews: 72, price: 135, exp: 10, initial: 'N' },
@@ -195,6 +196,7 @@ let activeCategory = 'all';
 let selectedTherapist = null;
 let selectedTherapistId = null;
 let currentList = [];
+let _moodDone = false, _matchScores = {};
 
 function renderCategories() {
   const favCount = TeraFeatures.getFavCount();
@@ -213,7 +215,8 @@ function renderCards() {
   const sort = document.getElementById('sortBy').value;
 
   let list = therapists.filter(t => {
-    if (activeCategory === 'favs') return TeraFeatures.isFav(t.id || t.name);
+    if (activeCategory === 'favs')  return TeraFeatures.isFav(t.id || t.name);
+    if (activeCategory === 'today') return t.available_today;
     if (activeCategory !== 'all' && t.cat !== activeCategory) return false;
     if (_onlineOnly && !t.online) return false;
     if (area && t.area !== area) return false;
@@ -239,12 +242,13 @@ function renderCards() {
     <div class="card" style="animation-delay:${i*45}ms">
       <div class="card-img">
         ${TeraFeatures.favButtonHTML(t.id || t.name, 'en')}
-        ${t.badge ? `<div class="badge">${e(t.badge)}</div>` : ''}
+        ${t.available_today ? '<div class="badge badge-today">🟢 Today</div>' : (t.badge ? `<div class="badge">${e(t.badge)}</div>` : '')}
         ${cu(t.photo) ? `<div class="avatar" style="background-image:url('${cu(t.photo)}');background-size:cover;background-position:center;"></div>` : `<div class="avatar">${e(t.initial)}</div>`}
       </div>
       <div class="card-body">
         <h3>${e(t.name)}</h3>
         <div class="speciality">${e(t.speciality)}</div>
+        ${_moodDone && _matchScores[t.id||t.name] ? `<div style="margin:2px 0 4px;">${TeraFeatures.matchScoreHTML(_matchScores[t.id||t.name])}</div>` : ''}
         ${TeraData.contactLinksHTML(t)}
         <div class="info-row">
           <div>📍 ${e(t.area)}</div>
@@ -288,7 +292,7 @@ function closeModal() {
   document.getElementById('modalSuccessWrap').style.display = 'none';
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
 }
-function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'he'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
+function viewProfile(i){ const t=currentList[i]; const lg=document.documentElement.lang||'en'; sessionStorage.setItem('tb_profile',JSON.stringify(t)); sessionStorage.setItem('tb_lang',lg); sessionStorage.setItem('tb_list',JSON.stringify(currentList)); location.href=(t.id?('/t/'+encodeURIComponent(t.id)+'?lang='+lg):('therapist.html?lang='+lg)); }
 
 async function confirmBooking() {
   const name = document.getElementById('bName').value.trim();
@@ -353,6 +357,8 @@ async function boot() {
       }
     }
     if (result.mode === 'online') _onlineOnly = true;
+    _moodDone = true;
+    _matchScores = TeraFeatures.computeMatchScores(therapists, result);
     renderCategories();
     renderCards();
     TeraFeatures.renderStats('statsBar', therapists, STATS_L);
@@ -361,6 +367,7 @@ async function boot() {
       document.querySelector('.listings')?.scrollIntoView({ behavior: 'smooth' });
     });
   });
+  TeraFeatures.initCrisisBar('en');
 }
 boot();
 </script>
